@@ -45,60 +45,86 @@ export function createFilm({ reduce, gsap, $ }) {
     $('#flash').style.setProperty('--fx', contact.x + 'px'); $('#flash').style.setProperty('--fy', contact.y + 'px');
   }
 
-  /* synapse overlay */
+  /* spark overlay: crackling lightning arcs, ember sparks and a pulsing star core at the touch point */
   const spr = document.createElement('canvas'); spr.width = spr.height = 32;
   { const g = spr.getContext('2d'), r = g.createRadialGradient(16, 16, 0, 16, 16, 16); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(.3, 'rgba(190,225,255,.7)'); r.addColorStop(1, 'rgba(91,168,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 32, 32); }
-  let ts = 9; const tr = () => (ts = (ts * 16807) % 2147483647, (ts - 1) / 2147483646);
-  const DIRS = [0, Math.PI / 4, -Math.PI / 4, Math.PI, Math.PI * 3 / 4, -Math.PI * 3 / 4, Math.PI / 2, -Math.PI / 2];
-  const TRACES = Array.from({ length: innerWidth < 700 ? 18 : 30 }, (_, k) => {
-    let a = DIRS[k % 8 < 6 ? k % 6 : 6 + (k % 2)] + (tr() - .5) * .2, x = (tr() - .5) * 6, y = (tr() - .5) * 6;
-    const pts = [[x, y]], segs = 3 + Math.floor(tr() * 6); let len = 0;
-    for (let i = 0; i < segs; i++) { if (i && tr() < .5) a += (tr() < .5 ? 1 : -1) * Math.PI / 4; const l = 16 + tr() * 40; x += Math.cos(a) * l; y += Math.sin(a) * l * .8; len += l; pts.push([x, y]); }
-    return { pts, len, delay: tr() * .45, speed: .004 + tr() * .006, ph: tr(), boost: 0 };
-  });
-  const RINGS = []; let ringClock = 0;
-  const ring = power => RINGS.push({ life: 0, max: 80 + power * 40, power });
-  function pointAt(t, dist) { let acc = 0; for (let i = 1; i < t.pts.length; i++) { const a = t.pts[i - 1], b = t.pts[i], l = Math.hypot(b[0] - a[0], b[1] - a[1]);
-      if (acc + l >= dist) { const f = (dist - acc) / l; return [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f]; } acc += l; } return t.pts[t.pts.length - 1]; }
+  const TAU = Math.PI * 2, R = Math.random, SPARKS = [], MAXS = innerWidth < 700 ? 180 : 360;
+  let arcs = [], arcClock = 0, boost = 0, emitAcc = 0;
+  function bolt(x0, y0, x1, y1, disp, out) {                 // midpoint displacement: a jagged lightning path
+    if (disp < 2.5) { out.push(x1, y1); return; }
+    const mx = (x0 + x1) / 2 + (R() - .5) * disp, my = (y0 + y1) / 2 + (R() - .5) * disp;
+    bolt(x0, y0, mx, my, disp / 2, out); bolt(mx, my, x1, y1, disp / 2, out);
+  }
+  function makeArcs(I) {
+    const n = Math.round(2 + I * 4 + boost * 6), list = [];
+    for (let i = 0; i < n; i++) {
+      const a = (R() < .5 ? 0 : Math.PI) + (R() - .5) * (i < 2 ? .5 : 2.4), len = (30 + R() * 90) * (.6 + I * .8 + boost * .6);
+      const pts = [0, 0]; bolt(0, 0, Math.cos(a) * len, Math.sin(a) * len * .75, len * .35, pts); list.push({ pts, w: .6 + R() * .6 });
+      const np = pts.length / 2;
+      if (np > 3 && R() < .55) {                              // a forked branch
+        const j = 2 * (1 + Math.floor(R() * (np - 2))), bx = pts[j], by = pts[j + 1], ba = a + (R() - .5) * 1.6, bl = len * (.25 + R() * .3), bp = [bx, by];
+        bolt(bx, by, bx + Math.cos(ba) * bl, by + Math.sin(ba) * bl, bl * .4, bp); list.push({ pts: bp, w: .4 });
+      }
+    }
+    return list;
+  }
+  function emit(n, power) {
+    for (let i = 0; i < n && SPARKS.length < MAXS; i++) {
+      const a = R() * TAU, sp = (1.5 + R() * 4.5) * power;
+      SPARKS.push({ x: (R() - .5) * 4, y: (R() - .5) * 4, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * .8, life: 0, max: 30 + R() * 40 });
+    }
+  }
   function synapse() {
     sx.setTransform(dpr, 0, 0, dpr, 0, 0); sx.clearRect(0, 0, W, H);
-    if (st.alpha < .02) return;
+    if (st.alpha < .02) { SPARKS.length = 0; return; }
     const I = INT[Math.round(st.f)] || 0, near = m.in ? Math.max(0, 1 - Math.hypot(m.x - contact.x, m.y - contact.y) / 280) : 0;
     const k = scaleNow * 1.15, cx = contact.x, cy = contact.y, T = performance.now();
+    boost *= .95;
+    const energy = Math.max(I, near * .6, boost), fl = Math.min(1, I * 1.2 + near * .4 + boost * .6) * st.alpha;
     sx.globalCompositeOperation = 'lighter'; sx.lineCap = 'round'; sx.lineJoin = 'round';
-    const fl = Math.min(1, I * 1.2 + near * .4) * st.alpha;
+
+    /* soft halo */
     if (fl > .02) {
-      const wl = W * (.25 + .55 * fl), g = sx.createLinearGradient(cx - wl, 0, cx + wl, 0);
-      g.addColorStop(0, 'rgba(91,168,255,0)'); g.addColorStop(.5, `rgba(220,238,255,${.75 * fl})`); g.addColorStop(1, 'rgba(91,168,255,0)');
-      sx.fillStyle = g; sx.fillRect(cx - wl, cy - 1, wl * 2, 2); sx.globalAlpha = .25 * fl; sx.fillRect(cx - wl * .7, cy - 7, wl * 1.4, 14); sx.globalAlpha = 1;
+      const hr = 170 * k * (.4 + fl), hg = sx.createRadialGradient(cx, cy, 0, cx, cy, hr);
+      hg.addColorStop(0, `rgba(159,208,255,${.22 * fl})`); hg.addColorStop(1, 'rgba(91,168,255,0)');
+      sx.fillStyle = hg; sx.fillRect(cx - hr, cy - hr, hr * 2, hr * 2);
     }
-    if (!reduce && I > .12) { ringClock += 1 + I + near; if (ringClock > 70 - I * 35) { ringClock = 0; ring(I); } }
-    for (let i = RINGS.length - 1; i >= 0; i--) {
-      const r = RINGS[i]; r.life++; if (r.life > r.max) { RINGS.splice(i, 1); continue; }
-      const t = r.life / r.max, e = 1 - Math.pow(1 - t, 3), R = e * (140 + r.power * 220) * k;
-      sx.strokeStyle = `rgba(170,215,255,${Math.pow(1 - t, 1.6) * .7 * st.alpha})`; sx.lineWidth = 1.2 + (1 - t) * 1.5;
-      sx.beginPath(); sx.ellipse(cx, cy, R, R * .32, -.12, 0, Math.PI * 2); sx.stroke();
-      sx.strokeStyle = `rgba(170,215,255,${Math.pow(1 - t, 2) * .18 * st.alpha})`; sx.lineWidth = 1; sx.beginPath(); sx.arc(cx, cy, R * .75, 0, Math.PI * 2); sx.stroke();
-    }
-    TRACES.forEach(t => {
-      t.boost *= .97;
-      const grow = reduce ? 1 : Math.max(0, Math.min(1, (I * 1.5 + near * .35 + t.boost - t.delay) / .55));
-      if (grow <= 0) return;
-      const drawn = t.len * grow, a = st.alpha * (.35 + .65 * Math.min(1, I + near + t.boost));
-      sx.beginPath(); let acc = 0; sx.moveTo(cx + t.pts[0][0] * k, cy + t.pts[0][1] * k);
-      for (let i = 1; i < t.pts.length; i++) { const p0 = t.pts[i - 1], p1 = t.pts[i], l = Math.hypot(p1[0] - p0[0], p1[1] - p0[1]);
-        if (acc + l >= drawn) { const f = (drawn - acc) / l; sx.lineTo(cx + (p0[0] + (p1[0] - p0[0]) * f) * k, cy + (p0[1] + (p1[1] - p0[1]) * f) * k); break; }
-        sx.lineTo(cx + p1[0] * k, cy + p1[1] * k); acc += l; }
-      sx.strokeStyle = `rgba(91,168,255,${.22 * a})`; sx.lineWidth = 4; sx.stroke();
-      sx.strokeStyle = `rgba(200,230,255,${.7 * a})`; sx.lineWidth = 1.1; sx.stroke();
-      if (grow >= 1) { const e = t.pts[t.pts.length - 1]; sx.strokeStyle = `rgba(220,240,255,${.8 * a})`; sx.lineWidth = 1.2; sx.beginPath(); sx.arc(cx + e[0] * k, cy + e[1] * k, 2.6, 0, Math.PI * 2); sx.stroke(); }
-      for (let n = 0; n < 1 + (I > .6 ? 1 : 0); n++) {
-        const ph = reduce ? .5 : ((T * t.speed * .06 + t.ph + n * .5) % 1), p = pointAt(t, ph * drawn), s = (5 + 6 * (t.boost + near)) * (1 - ph * .6);
-        sx.globalAlpha = a * (1 - ph * .5); sx.drawImage(spr, cx + p[0] * k - s, cy + p[1] * k - s, s * 2, s * 2); sx.globalAlpha = 1;
-      }
+
+    /* crackling arcs: regenerated every few frames so they flicker like real electricity */
+    if (energy > .08) { if (reduce) { if (!arcs.length) arcs = makeArcs(energy); } else if (++arcClock > 3) { arcClock = 0; arcs = makeArcs(energy); } }
+    else arcs = [];
+    const flick = reduce ? 1 : .6 + .4 * R();
+    arcs.forEach(arc => {
+      const p = arc.pts; sx.beginPath(); sx.moveTo(cx + p[0] * k, cy + p[1] * k);
+      for (let i = 2; i < p.length; i += 2) sx.lineTo(cx + p[i] * k, cy + p[i + 1] * k);
+      sx.strokeStyle = `rgba(91,168,255,${.28 * fl * flick})`; sx.lineWidth = 5 * arc.w; sx.stroke();
+      sx.strokeStyle = `rgba(228,243,255,${.9 * fl * flick})`; sx.lineWidth = 1.3 * arc.w; sx.stroke();
     });
-    const rr = 40 * k * (.5 + I), cg = sx.createRadialGradient(cx, cy, 0, cx, cy, rr); cg.addColorStop(0, `rgba(255,255,255,${.9 * fl})`); cg.addColorStop(1, 'rgba(159,208,255,0)');
-    sx.fillStyle = cg; sx.beginPath(); sx.arc(cx, cy, rr, 0, Math.PI * 2); sx.fill(); sx.globalCompositeOperation = 'source-over';
+
+    /* ember sparks thrown off the contact */
+    if (!reduce) { emitAcc += I * 2.2 + near * .8; while (emitAcc > 1) { emitAcc--; emit(1, .6 + I); } }
+    for (let i = SPARKS.length - 1; i >= 0; i--) {
+      const s = SPARKS[i]; if (++s.life > s.max) { SPARKS.splice(i, 1); continue; }
+      s.x += s.vx; s.y += s.vy; s.vx *= .95; s.vy = s.vy * .95 + .04;
+      const t = s.life / s.max, a = (1 - t) * st.alpha, hx = cx + s.x * k, hy = cy + s.y * k;
+      sx.strokeStyle = `rgba(200,230,255,${.8 * a})`; sx.lineWidth = 1.2;
+      sx.beginPath(); sx.moveTo(hx - s.vx * k * 3, hy - s.vy * k * 3); sx.lineTo(hx, hy); sx.stroke();
+      const z = 3 + 3 * (1 - t); sx.globalAlpha = a; sx.drawImage(spr, hx - z, hy - z, z * 2, z * 2); sx.globalAlpha = 1;
+    }
+
+    /* pulsing star core with diffraction spikes */
+    if (fl > .02) {
+      const rr = 34 * k * (.5 + I + boost * .5) * (1 + .12 * Math.sin(T * .012)), cg = sx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+      cg.addColorStop(0, `rgba(255,255,255,${.95 * fl})`); cg.addColorStop(.35, `rgba(207,230,255,${.5 * fl})`); cg.addColorStop(1, 'rgba(159,208,255,0)');
+      sx.fillStyle = cg; sx.beginPath(); sx.arc(cx, cy, rr, 0, TAU); sx.fill();
+      const L = rr * (2.5 + fl * 3.5), rot = reduce ? .2 : T * .00025;
+      for (let i = 0; i < 4; i++) {
+        const thin = i % 2, len = L * (thin ? .55 : 1), sg = sx.createLinearGradient(-len, 0, len, 0);
+        sg.addColorStop(0, 'rgba(159,208,255,0)'); sg.addColorStop(.5, `rgba(240,248,255,${(thin ? .45 : .8) * fl})`); sg.addColorStop(1, 'rgba(159,208,255,0)');
+        sx.save(); sx.translate(cx, cy); sx.rotate(rot + i * Math.PI / 4); sx.fillStyle = sg; sx.fillRect(-len, thin ? -.5 : -.9, len * 2, thin ? 1 : 1.8); sx.restore();
+      }
+    }
+    sx.globalCompositeOperation = 'source-over';
   }
 
   new IntersectionObserver(es => es.forEach(en => { onScreen = en.isIntersecting; })).observe(host);
@@ -108,7 +134,7 @@ export function createFilm({ reduce, gsap, $ }) {
   })();
   host.addEventListener('pointermove', e => { const r = host.getBoundingClientRect(); m.x = e.clientX - r.left; m.y = e.clientY - r.top; m.in = true; });
   host.addEventListener('pointerleave', () => { m.in = false; });
-  host.addEventListener('pointerdown', e => { if (e.target.closest('a,button')) return; ring(1.2); ring(.6); TRACES.forEach(t => t.boost = 1); gsap.fromTo('#glow', { opacity: 1 }, { opacity: .4, duration: .8 }); });
+  host.addEventListener('pointerdown', e => { if (e.target.closest('a,button')) return; boost = 1; emit(70, 1.6); arcs = makeArcs(1); gsap.fromTo('#glow', { opacity: 1 }, { opacity: .4, duration: .8 }); });
   addEventListener('resize', size);
   if (!matchMedia('(pointer:fine)').matches) $('#fhint').textContent = 'Tap near the light to send a pulse.';
 
