@@ -12,6 +12,7 @@ if (REDUCE) document.documentElement.classList.add('rm');
 const ROUTES = ['home', 'services', 'projects', 'careers', 'insights', 'contact'];
 const TITLES = { home: 'Vastverse — Innovation from Vision', services: 'What we do | Vastverse', projects: 'Projects | Vastverse', careers: 'Careers | Vastverse', insights: 'Insights | Vastverse', contact: "Let's talk | Vastverse" };
 const HMODE = false;
+const INTRO_LOADER_DURATION = 1750; // + ~0.75s explode exit = ~2.5s total intro
 
 let C = FALLBACK, route = null, ctx = null, journey = null, pendingSvc = null, currentSvc = 0;
 
@@ -207,8 +208,8 @@ function setupPage(r) {
     if (r === 'home') {
       universe && universe.setVisible(REDUCE ? 1 : 0);
       $('#jmap').classList.add('hide');
-      film.timeline(ScrollTrigger, { onDone: done => { universe && universe.setVisible(done ? 1 : 0); $('#jmap').classList.toggle('hide', !done); if (done) showTip(); } });
-    } else { universe && universe.setVisible(1); $('#jmap').classList.remove('hide'); showTip(); }
+      film.timeline(ScrollTrigger, { onDone: done => { universe && universe.setVisible(done ? 1 : 0); $('#jmap').classList.toggle('hide', !done); } });
+    } else { universe && universe.setVisible(1); $('#jmap').classList.remove('hide'); }
     journey = buildJourney(page, r);
     if (REDUCE) $$('[data-count]', page).forEach(c => c.textContent = c.dataset.count + (c.dataset.suf || ''));
     else animatePage(page, journey);
@@ -252,9 +253,6 @@ document.addEventListener('click', e => {
 addEventListener('popstate', () => { const h = location.hash.slice(1); if (ROUTES.includes(h) && h !== route) go(h); });
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => journey && journey.measure(), 250); });
 
-let tipShown = false;
-function showTip() { if (tipShown || REDUCE) return; tipShown = true; const t = $('#burstTip'); setTimeout(() => t.classList.add('show'), 1200); setTimeout(() => t.classList.remove('show'), 7500); }
-
 /* ============================================================ boot */
 initCursor(); initTilt(REDUCE); initModal();
 (async () => {
@@ -263,4 +261,15 @@ initCursor(); initTilt(REDUCE); initModal();
   const start = ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'home';
   if (!ROUTES.includes(location.hash.slice(1))) history.replaceState(null, '', '#home');
   go(start);
+  const loader = $('#introLoader');
+  const elapsed = performance.now() - window.__vvLoaderStartedAt;
+  const finish = () => {
+    loader.classList.add('is-done');
+    document.body.classList.remove('is-loading');
+    setTimeout(() => { window.__vvIntro && window.__vvIntro.stop(); loader.remove(); }, 800);
+  };
+  setTimeout(() => {
+    // the loader completes its bar, explodes the planet past the camera, then calls finish
+    if (window.__vvIntro) window.__vvIntro.done(finish); else finish();
+  }, Math.max(0, INTRO_LOADER_DURATION - elapsed));
 })();

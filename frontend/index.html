@@ -11,6 +11,136 @@
 <link rel="stylesheet" href="./src/styles.css">
 </head>
 <body>
+<script>window.__vvLoaderStartedAt = performance.now(); document.body.classList.add('is-loading');</script>
+<div class="intro-loader" id="introLoader" role="status" aria-label="Loading Vastverse">
+  <canvas id="introCv" aria-hidden="true"></canvas>
+  <div class="il-vignette" aria-hidden="true"></div>
+  <div class="il-brand">
+    <span class="il-word">vastverse<span>,</span></span>
+    <span class="il-tag">innovation from vision</span>
+  </div>
+  <div class="il-foot" aria-hidden="true">
+    <span class="il-kicker">Entering the verse</span>
+  </div>
+</div>
+<script>
+/* Intro loader: a particle planet collapses out of a scattered cloud (same motion language as the
+   particle worlds in verse.js). On done() it scatters back out into a wide cloud and hands off to the page. */
+(function () {
+  var root = document.getElementById('introLoader'), cv = document.getElementById('introCv'), g = cv.getContext('2d');
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var small = innerWidth < 700, N = small ? 900 : 1700, TAU = Math.PI * 2;
+  var W, H, dpr, R, cx, cy, seed = 7;
+  function rnd() { seed = seed * 16807 % 2147483647; return (seed - 1) / 2147483646; }
+  function gauss() { var u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * v); }
+  function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function ease(x) { x = clamp(x); return x * x * (3 - 2 * x); }
+
+  /* glow sprites in the site palette */
+  function sprite(rgb) {
+    var c = document.createElement('canvas'); c.width = c.height = 32;
+    var x = c.getContext('2d'), r = x.createRadialGradient(16, 16, 0, 16, 16, 16);
+    r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(.25, 'rgba(' + rgb + ',.85)'); r.addColorStop(1, 'rgba(' + rgb + ',0)');
+    x.fillStyle = r; x.fillRect(0, 0, 32, 32); return c;
+  }
+  var SPR = [sprite('255,255,255'), sprite('159,208,255'), sprite('91,168,255')];
+
+  /* digital planet: surface, lat/long lines, a tilted orbit ring; scattered start cloud */
+  var P = [];
+  function tiltRing(x, y, z) { var a = 1.18, c = Math.cos(a), s = Math.sin(a), y2 = y * c - z * s, z2 = y * s + z * c; a = -.12; c = Math.cos(a); s = Math.sin(a); return [x * c - y2 * s, x * s + y2 * c, z2]; }
+  for (var i = 0; i < N; i++) {
+    var k = rnd(), a = rnd() * TAU, t;
+    if (k < .48) { var u = rnd() * 2 - 1, s = Math.sqrt(1 - u * u), rr = 1 + gauss() * .012; t = [s * Math.cos(a) * rr, u * rr, s * Math.sin(a) * rr]; }
+    else if (k < .8) {
+      if (rnd() < .5) { var lat = (Math.floor(rnd() * 7) - 3) * .38, r2 = Math.cos(lat); t = [Math.cos(a) * r2, Math.sin(lat), Math.sin(a) * r2]; }
+      else { var lon = Math.floor(rnd() * 8) / 8 * Math.PI; t = [Math.cos(a) * Math.cos(lon), Math.sin(a), Math.cos(a) * Math.sin(lon)]; }
+    } else { var ro = 1.55 + gauss() * .025 + (rnd() < .3 ? .16 : 0); t = tiltRing(Math.cos(a) * ro, gauss() * .008, Math.sin(a) * ro); }
+    var u2 = rnd() * 2 - 1, s2 = Math.sqrt(1 - u2 * u2), a2 = rnd() * TAU, ER = 2.6 + Math.pow(rnd(), .5) * 4.5;
+    var rn = rnd();
+    P.push({ t: t, e: [Math.cos(a2) * s2 * ER * 1.5, u2 * ER * .9, Math.sin(a2) * s2 * ER * .6], r: rn, c: rn < .45 ? 1 : rn < .8 ? 0 : 2, k: k >= .8 });
+  }
+  var STARS = [];
+  for (var j = 0; j < (small ? 110 : 220); j++) STARS.push([rnd(), rnd(), .3 + rnd() * 1.1, rnd() * TAU, rnd()]);
+
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2); W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px';
+    R = Math.min(W * .19, H * .19, 170); cx = W / 2; cy = H * .42;
+    root.style.setProperty('--il-r', R + 'px');
+  }
+  addEventListener('resize', resize); resize();
+
+  var mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+  addEventListener('pointermove', function (e) { mouse.tx = e.clientX / W * 2 - 1; mouse.ty = e.clientY / H * 2 - 1; }, { passive: true });
+
+  var t0 = performance.now(), finishing = false, exitAt = 0, onFinish = null, alive = true;
+
+  function frame(now) {
+    if (!alive) return;
+    var T = (now - t0) / 1000;
+    if (finishing && !exitAt) {
+      exitAt = now;
+      root.classList.add('is-exiting');
+    }
+    var X = exitAt ? clamp((now - exitAt) / 750) : 0;   // exit progress
+
+    var asm = 1;                                           // planet is already formed: no assembly
+    var fadeIn = reduce ? 1 : ease(T / .35);               // just a quick fade-in
+    var e = reduce ? X : 1 - Math.pow(1 - clamp(X * 1.1), 3);   // explosion: fast burst outward, then drifts
+    var zoom = .9 + .1 * asm;
+    mouse.x += (mouse.tx - mouse.x) * .04; mouse.y += (mouse.ty - mouse.y) * .04;
+    var spin = reduce ? .6 : T * .55 + X * X * 1.2, ax = .32 + mouse.y * .12, cs = Math.cos(spin), sn = Math.sin(spin), cxr = Math.cos(ax), sxr = Math.sin(ax);
+    var ocx = cx + mouse.x * -10, ocy = cy + mouse.y * -6;
+
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1; g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+    g.globalCompositeOperation = 'lighter';
+
+    /* star field */
+    for (var q = 0; q < STARS.length; q++) {
+      var st = STARS[q], tw = .45 + .55 * Math.sin(T * (1 + st[4] * 2) + st[3]);
+      g.globalAlpha = (.18 + .42 * tw) * (1 - X);
+      g.fillStyle = st[4] < .7 ? '#BFD8FF' : '#9FD0FF';
+      var sx = (st[0] * W + mouse.x * -st[2] * 6 + W) % W, sy = (st[1] * H + mouse.y * -st[2] * 4 - X * X * 40 + H) % H;
+      g.fillRect(sx, sy, st[2], st[2]);
+    }
+
+    /* particles */
+    var cam = 4.2;
+    for (var p = 0; p < N; p++) {
+      var o = P[p], ep = clamp(e * 1.35 - o.r * .35);
+      var tx = o.t[0] * zoom, ty = o.t[1] * zoom, tz = o.t[2] * zoom;
+      var spread = 1.3 + X * 2.2;                                 // on exit the planet explodes outward into the starfield
+      var x = tx + (o.e[0] * spread - tx) * ep, y = ty + (o.e[1] * spread - ty) * ep, z = tz + (o.e[2] - tz) * ep;
+      var sw = ep * (1 - ep) * 4 * (o.r - .5) * 3.2;
+      if (sw) { var c1 = Math.cos(sw), s1 = Math.sin(sw), nx = x * c1 - z * s1; z = x * s1 + z * c1; x = nx; }
+      var x1 = x * cs - z * sn, z1 = x * sn + z * cs;            // spin (y axis)
+      var y2 = y * cxr - z1 * sxr, z2 = y * sxr + z1 * cxr;      // tilt (x axis)
+      var d = cam - z2; if (d < .25) continue;
+      var f = cam / d, px = ocx + x1 * R * f, py = ocy + y2 * R * f;
+      if (px < -40 || px > W + 40 || py < -40 || py > H + 40) continue;
+      var depth = clamp((z2 + 1.4) / 2.8), twk = .7 + .3 * Math.sin(T * (1.5 + o.r * 3) + o.r * 60);
+      var size = (1.6 + o.r * o.r * 3.6) * f * (o.k ? .85 : 1) * (1 + e * .35) * twk;
+      g.globalAlpha = Math.min(1, (.22 + .78 * depth) * (.55 + .45 * twk) * (1 - X * .6) * fadeIn);
+      g.drawImage(SPR[o.c], px - size, py - size, size * 2, size * 2);
+    }
+
+    /* core glow */
+    var cg = g.createRadialGradient(ocx, ocy, 0, ocx, ocy, R * 1.6);
+    cg.addColorStop(0, 'rgba(159,208,255,' + (.10 * asm * (1 - X)) + ')'); cg.addColorStop(1, 'rgba(91,168,255,0)');
+    g.globalAlpha = 1; g.fillStyle = cg; g.fillRect(ocx - R * 1.6, ocy - R * 1.6, R * 3.2, R * 3.2);
+
+    if (X >= .45 && onFinish)   /* start revealing the page mid-explosion: crossfade, not a hard cut */ { var cb = onFinish; onFinish = null; cb(); }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  window.__vvIntro = {
+    done: function (cb) { if (finishing) return; finishing = {}; onFinish = cb; },
+    stop: function () { alive = false; removeEventListener('resize', resize); }
+  };
+})();
+</script>
 <div id="universe" aria-hidden="true"></div>
 <div class="scrim" aria-hidden="true"></div>
 <div class="progress" aria-hidden="true"><i id="prog"></i></div>
@@ -26,7 +156,6 @@
 <header class="nav" id="nav">
   <div class="nav-in">
     <a class="brand" href="#home" data-link aria-label="Vastverse home">
-      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="18" stroke="#9AA6BE" stroke-width="1.2"/><circle cx="20" cy="20" r="11" stroke="#9FD0FF" stroke-width="1.2" stroke-dasharray="2.2 2.6"/><circle cx="21.5" cy="19" r="4.6" fill="#F3F6FF"/></svg>
       <span><b>vastverse<span class="brand-comma">,</span></b><small>innovation from vision</small></span>
     </a>
     <ul class="menu">
@@ -314,8 +443,6 @@
 </div>
 
 <nav class="jmap hide" id="jmap" aria-label="Sections"><span class="lbl" id="jlbl"></span><div class="dots" id="jdots"></div></nav>
-
-<div class="burst-tip" id="burstTip" aria-hidden="true">Tip: click empty space to burst the shape. Scroll to zoom through it.</div>
 
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="sheet" id="sheet"><button class="x" id="mClose" aria-label="Close">×</button><div id="mBody"></div></div>

@@ -8,6 +8,7 @@
 html{-webkit-text-size-adjust:100%;scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar{display:none}
 body{font-family:var(--body);font-size:1.0625rem;line-height:1.6;color:var(--light);background:var(--void);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body.is-loading{overflow:hidden}
 ::selection{background:var(--spark);color:#000}
 a{color:inherit} button{font:inherit;color:inherit} img{display:block;max-width:100%}
 :focus-visible{outline:2px solid var(--spark);outline-offset:3px;border-radius:6px}
@@ -26,6 +27,26 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:500;letter-spacing:-.025em;li
 #app.leaving{opacity:0}
 .progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:60;pointer-events:none}
 .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--spark2),#fff);transform-origin:0 50%;transform:scaleX(0)}
+/* ---------- intro loader: same void, particles and synapse light as the page ---------- */
+.intro-loader{--il-r:170px;position:fixed;inset:0;z-index:88;overflow:hidden;background:var(--void);transition:opacity .7s cubic-bezier(.4,0,.2,1),visibility .7s}
+.intro-loader canvas{position:absolute;inset:0;display:block}
+.il-vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(140% 100% at 50% 42%,transparent 55%,rgba(0,0,0,.6)),linear-gradient(180deg,transparent 60%,rgba(0,0,0,.7))}
+.il-brand{position:absolute;left:0;right:0;top:calc(42% + var(--il-r) * 1.25 + 34px);display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:0 16px;animation:il-rise .4s .1s cubic-bezier(.3,.7,.4,1) both;will-change:transform,opacity}
+.il-word{font:700 clamp(2rem,5.4vw,3.6rem)/1 var(--body);letter-spacing:-.055em;color:var(--light);text-shadow:0 0 24px rgba(159,208,255,.22)}
+.il-word span{color:#A48D18;letter-spacing:0;margin-left:1px}
+.il-tag{font-size:.8rem;color:var(--steel);letter-spacing:.02em}
+.il-foot{position:absolute;left:0;right:0;bottom:max(28px,6vh);display:flex;justify-content:center;animation:il-fade .4s .1s ease-out both}
+.il-kicker{display:inline-flex;align-items:center;gap:10px;font-size:.85rem;color:var(--spark)}
+.il-kicker::before{content:"";width:22px;height:1px;background:currentColor}
+.intro-loader.is-exiting .il-brand{animation:il-zoom .75s cubic-bezier(.22,.61,.36,1) forwards;will-change:transform,opacity}
+.intro-loader.is-exiting .il-foot{animation:il-out .4s ease-out forwards}
+.intro-loader.is-done{opacity:0;visibility:hidden;pointer-events:none}
+@keyframes il-rise{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes il-fade{from{opacity:0}to{opacity:1}}
+@keyframes il-out{to{opacity:0;transform:translateY(-12px)}}
+@keyframes il-zoom{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.6)}}
+@media (max-width:600px){.il-kicker{font-size:.78rem}}
+@media (prefers-reduced-motion:reduce){.il-brand,.il-foot,.intro-loader.is-exiting .il-brand{animation:none}}
 .ptip{position:fixed;left:0;top:0;z-index:30;pointer-events:none;padding:10px 14px;border-radius:12px;background:rgba(6,9,15,.88);border:1px solid var(--line2);backdrop-filter:blur(8px);font-size:.85rem;opacity:0;transform:translate(-50%,-120%) scale(.96);transition:opacity .25s,transform .25s;white-space:nowrap}
 .ptip.show{opacity:1;transform:translate(-50%,-130%) scale(1)}
 .ptip b{display:block;font-family:var(--display);font-weight:500;font-size:.95rem}
@@ -51,8 +72,7 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:500;letter-spacing:-.025em;li
 header.nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .35s,border-color .35s;border-bottom:1px solid transparent}
 header.nav.solid{background:rgba(0,0,0,.6);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-color:var(--line)}
 .nav-in{display:flex;align-items:center;justify-content:space-between;height:74px;padding:0 max(24px,4vw)}
-.brand{display:flex;align-items:center;gap:12px;text-decoration:none}
-.brand svg{width:34px;height:34px;flex:none}
+.brand{display:flex;align-items:center;text-decoration:none}
 .brand b{display:block;font-family:var(--body);font-weight:700;font-size:1.7rem;letter-spacing:-.055em;line-height:1.1}
 .brand .brand-comma{color:#A48D18;letter-spacing:0;margin-left:1px}
 .brand small{display:block;font-size:.72rem;color:var(--steel)}
@@ -121,8 +141,6 @@ html.hmode .al-bottom{justify-content:flex-end}
   .panel .sol{height:220px}
   .panel .big{font-size:clamp(2.4rem,4.6vw,4.8rem)}
 }
-.burst-tip{position:fixed;left:50%;bottom:26px;transform:translate(-50%,10px);z-index:40;font-size:.84rem;color:#D7DEEC;padding:9px 16px;border-radius:999px;background:rgba(6,9,15,.8);border:1px solid var(--line2);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .5s,transform .5s;white-space:nowrap}
-.burst-tip.show{opacity:1;transform:translate(-50%,0)}
 /* journey map */
 .jmap{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:40;display:flex;flex-direction:column;align-items:center;gap:12px;padding:14px 9px;border-radius:999px;background:rgba(0,0,0,.4);border:1px solid var(--line);backdrop-filter:blur(10px);transition:opacity .4s}
 .jmap.hide{opacity:0;pointer-events:none}
