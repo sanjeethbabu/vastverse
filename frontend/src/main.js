@@ -2,7 +2,6 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import FALLBACK from './content.json';
 import { api } from './api.js';
-import { estimateLocal, money } from './estimate.js';
 import { createVerse, PLANET_ORDER } from './verse.js';
 import { createFilm } from './film.js';
 import { $, $$, esc, initCursor, initTilt, splitHeadings, openModal, initModal, initArt } from './ui.js';
@@ -14,7 +13,7 @@ const ROUTES = ['home', 'services', 'projects', 'careers', 'insights', 'contact'
 const TITLES = { home: 'Vastverse — Innovation from Vision', services: 'What we do | Vastverse', projects: 'Projects | Vastverse', careers: 'Careers | Vastverse', insights: 'Insights | Vastverse', contact: "Let's talk | Vastverse" };
 const HMODE = false;
 
-let C = FALLBACK, route = null, ctx = null, journey = null, pendingSvc = null, pendingEstimate = null, currentSvc = 0;
+let C = FALLBACK, route = null, ctx = null, journey = null, pendingSvc = null, currentSvc = 0;
 
 /* ============================================================ content */
 function renderContent() {
@@ -60,7 +59,6 @@ function renderContent() {
     <div><h4>Get in touch</h4><p>${esc(ct.address)}</p><p style="margin-top:10px">${esc(ct.phone)}<br>${esc(ct.email)}</p><a href="https://twitter.com/${esc(ct.twitter)}">@${esc(ct.twitter)}</a></div>
   </div><div class="fbase"><span>© ${new Date().getFullYear()} vastverse. All rights reserved.</span><span>Built with Three.js, GSAP and FastAPI.</span></div></div>`;
   $$('[data-footer]').forEach(f => f.innerHTML = foot);
-  renderEstimator();
   splitHeadings(); initArt(document, REDUCE);
 }
 
@@ -72,44 +70,9 @@ function showSvc(i, animate = true) {
   d.innerHTML = `<span class="kicker">${esc(s.world)}</span><h2>${esc(s.name)}</h2><p>${esc(s.summary)}</p>
     <div class="capgrid">${s.capabilities.map(c => `<div>${esc(c)}</div>`).join('')}</div>
     <div class="stack">${s.tools.map(t => `<span class="chip">${esc(t)}</span>`).join('')}<em>A modern stack selected for your project needs.</em></div>
-    <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-light" href="#contact" data-link data-pick="${esc(s.name)}">Discuss this service</a><button class="btn btn-line" data-estimate="${esc(s.id)}">Estimate the cost</button></div>`;
+    <div style="margin-top:22px"><a class="btn btn-light" href="#contact" data-link data-pick="${esc(s.name)}">Discuss this service</a></div>`;
   if (animate && !REDUCE) gsap.from(d.children, { y: 20, opacity: 0, duration: .5, stagger: .04, ease: 'power3.out' });
 }
-
-/* ============================================================ estimator */
-const est = { service: 'web', features: ['accounts', 'admin'], scale: 'growth', timeline: 'standard' };
-function renderEstimator() {
-  const E = C.estimator, chip = (name, type, val, label, on) => `<label class="chip-in"><input type="${type}" name="${name}" value="${esc(val)}" ${on ? 'checked' : ''}><span>${esc(label)}</span></label>`;
-  $('#estSvc').innerHTML = C.services.map(s => chip('service', 'radio', s.id, s.name.replace(' & Technical Support', '').replace('Development', 'Dev'), s.id === est.service)).join('');
-  $('#estFeat').innerHTML = Object.entries(E.features).map(([k, v]) => chip('feature', 'checkbox', k, v[0], est.features.includes(k))).join('');
-  $('#estScale').innerHTML = Object.entries(E.scale).map(([k, v]) => chip('scale', 'radio', k, v[0], k === est.scale)).join('');
-  $('#estTime').innerHTML = Object.entries(E.timeline).map(([k, v]) => chip('timeline', 'radio', k, v[0], k === est.timeline)).join('');
-  updateEstimate();
-}
-let estTimer, estSeq = 0, lastEstimate = null;
-function updateEstimate() {
-  clearTimeout(estTimer);
-  estTimer = setTimeout(async () => {
-    const seq = ++estSeq; let r;
-    try { r = await api('/api/estimate', { method: 'POST', body: est, timeout: 2500 }); }
-    catch { r = estimateLocal(C.estimator, est.service, est.features, est.scale, est.timeline); }
-    if (seq !== estSeq) return;
-    lastEstimate = { ...r, input: { ...est } };
-    const svc = C.services.find(s => s.id === est.service);
-    $('#estOut').innerHTML = `<span class="kicker">Indicative estimate</span><div class="range" id="estRange">${money(r.low)} – ${money(r.high)}</div>
-      <div class="meta"><span>About ${r.weeks} weeks</span><span>Team of ${r.team}</span></div>
-      <ul>${r.breakdown.map(b => `<li><span>${esc(b.label)}</span><span>${money(b.amount)}</span></li>`).join('')}</ul>
-      <p class="note">${esc(r.note)} Projects typically start at ${money(C.estimator.minimum)}.</p>
-      <button class="btn btn-light" type="button" id="sendEst">Send this with my enquiry</button>`;
-    if (!REDUCE) gsap.fromTo('#estRange', { y: 10, opacity: .3 }, { y: 0, opacity: 1, duration: .45, ease: 'power2.out' });
-    $('#sendEst').onclick = () => { pendingEstimate = { ...lastEstimate, serviceName: svc.name }; go('contact'); };
-  }, 120);
-}
-$('#est').addEventListener('change', e => {
-  const t = e.target;
-  if (t.name === 'feature') est.features = $$('#estFeat input:checked').map(i => i.value); else if (t.name) est[t.name] = t.value;
-  updateEstimate();
-});
 
 /* ============================================================ forms + interactions */
 function validate(form, rules) {
@@ -123,22 +86,11 @@ $('#cf').addEventListener('submit', async e => {
   const bad = validate(f, [['name', v => v.length > 1], ['email', v => /^\S+@\S+\.\S+$/.test(v)], ['service', v => v.length > 0], ['details', v => v.length >= 20]]);
   if (bad) { msg.className = 'fmsg show err'; msg.textContent = 'Fill in your name, a valid email, a service and at least 20 characters of project details, then send again.'; bad.focus(); return; }
   btn.disabled = true; btn.textContent = 'Sending…';
-  const body = { name: f.elements.name.value.trim(), email: f.elements.email.value.trim(), company: f.elements.company.value.trim() || null, service: f.elements.service.value, details: f.elements.details.value.trim(), website: f.elements.website.value,
-    estimate: pendingEstimate ? { low: pendingEstimate.low, high: pendingEstimate.high, weeks: pendingEstimate.weeks, input: pendingEstimate.input } : null };
-  try { const r = await api('/api/contact', { method: 'POST', body }); msg.className = 'fmsg show'; msg.textContent = r.message; f.reset(); detachEstimate(); }
+  const body = { name: f.elements.name.value.trim(), email: f.elements.email.value.trim(), company: f.elements.company.value.trim() || null, service: f.elements.service.value, details: f.elements.details.value.trim(), website: f.elements.website.value };
+  try { const r = await api('/api/contact', { method: 'POST', body }); msg.className = 'fmsg show'; msg.textContent = r.message; f.reset(); }
   catch (err) { msg.className = 'fmsg show err'; msg.textContent = err.offline ? OFFLINE : err.message; }
   finally { btn.disabled = false; btn.textContent = 'Send message'; }
 });
-function attachEstimate() {
-  if (!pendingEstimate) return;
-  const p = pendingEstimate, f = $('#cf');
-  f.elements.service.value = p.serviceName;
-  if (!f.elements.details.value) f.elements.details.value = `I used your estimator: ${p.serviceName}, ${p.input.scale} scale, ${p.input.timeline} timeline. Estimated ${money(p.low)} to ${money(p.high)}, about ${p.weeks} weeks.\n\nAbout the project: `;
-  $('#attached span').textContent = `Estimate attached: ${money(p.low)} – ${money(p.high)}, about ${p.weeks} weeks`;
-  $('#attached').classList.add('show');
-}
-function detachEstimate() { pendingEstimate = null; $('#attached').classList.remove('show'); }
-$('#detach').addEventListener('click', detachEstimate);
 $('#newsForm').addEventListener('submit', async e => {
   e.preventDefault(); const f = e.target, m = $('#newsMsg');
   if (validate(f, [['email', v => /^\S+@\S+\.\S+$/.test(v)]])) { m.className = 'fmsg show err'; m.textContent = 'Enter a valid email address to subscribe.'; return; }
@@ -148,7 +100,6 @@ $('#newsForm').addEventListener('submit', async e => {
 
 document.addEventListener('click', e => {
   const tab = e.target.closest('.tabb'); if (tab) { showSvc(+tab.dataset.i); return; }
-  const es = e.target.closest('[data-estimate]'); if (es) { est.service = es.dataset.estimate; renderEstimator(); go('home', () => setTimeout(() => journey && journey.jumpTo(journey.panels.findIndex(p => p.dataset.name === 'Estimate')), 300)); return; }
   const fc = e.target.closest('.fchip');
   if (fc) {
     const group = fc.parentElement, items = $$(group.id === 'pfilters' ? '#projGrid > *' : '#posts > *');
@@ -282,7 +233,6 @@ function go(r, after) {
 }
 function applyPending() {
   if (route === 'services' && pendingSvc !== null) { showSvc(pendingSvc); pendingSvc = null; }
-  if (route === 'contact') attachEstimate();
 }
 function render(r) {
   route = r;

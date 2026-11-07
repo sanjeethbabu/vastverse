@@ -123,22 +123,27 @@
         <div class="steps" id="steps"></div>
       </div>
     </section>
-    <section class="panel" data-name="Estimate" data-shape="globe" data-side="0">
+    <section class="panel" data-name="Our vision" data-shape="globe" data-side="0">
       <div class="pin">
-        <span class="kicker">Project estimator</span>
-        <h2 class="h2 split">What could your project cost?</h2>
-        <p class="lede" data-reveal>Pick what you need and get an instant, indicative range. Send it to us with your enquiry when you're ready.</p>
-        <form class="est" id="est" onsubmit="return false">
-          <div class="card" data-reveal>
-            <fieldset><legend>Service</legend><div class="chips" id="estSvc"></div></fieldset>
-            <fieldset><legend>Features</legend><div class="chips" id="estFeat"></div></fieldset>
-            <div class="row2">
-              <fieldset><legend>Scale</legend><div class="chips" id="estScale"></div></fieldset>
-              <fieldset><legend>Timeline</legend><div class="chips" id="estTime"></div></fieldset>
-            </div>
-          </div>
-          <div class="card result" id="estOut" data-reveal aria-live="polite"></div>
-        </form>
+        <span class="kicker">Our vision</span>
+        <h2 class="h2 split">Technology that moves meaningful ideas forward.</h2>
+        <p class="lede" data-reveal>We envision a world where ambitious ideas can become useful, thoughtful technology that makes a lasting difference.</p>
+        <div class="why vision-mission">
+          <article class="card tilt" data-reveal><h3>A future shaped by possibility</h3><p>We believe technology should open doors, solve real problems and help people and businesses reach what once felt out of reach.</p></article>
+          <article class="card tilt" data-reveal><h3>Progress with purpose</h3><p>Innovation matters most when it serves people. We strive to build digital experiences that are accessible, dependable and ready to grow.</p></article>
+        </div>
+      </div>
+    </section>
+    <section class="panel" data-name="Our mission" data-shape="neural" data-side="0">
+      <div class="pin">
+        <span class="kicker">Our mission</span>
+        <h2 class="h2 split">Turn bold ideas into intelligent digital solutions.</h2>
+        <p class="lede" data-reveal>We bring strategy, design and engineering together to help teams move from a first idea to products people can rely on.</p>
+        <div class="why vision-mission">
+          <article class="card tilt" data-reveal><h3>Listen and understand</h3><p>We get close to your goals, your users and the challenge behind the brief before choosing what to build.</p></article>
+          <article class="card tilt" data-reveal><h3>Build with care</h3><p>Our senior team creates clear, scalable software with thoughtful design, transparent delivery and measurable outcomes.</p></article>
+          <article class="card tilt" data-reveal><h3>Grow together</h3><p>We stay accountable beyond launch, helping you learn from real use and keep improving as your needs evolve.</p></article>
+        </div>
       </div>
     </section>
     <section class="panel al-center" data-name="Let's talk" data-shape="infinity" data-side="0">
@@ -283,7 +288,6 @@
           </div>
           <label>Project details <span class="req">*</span><textarea name="details" required placeholder="Timeline, budget range and key requirements (at least 20 characters)"></textarea></label>
           <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
-          <div class="attached" id="attached"><span></span><button type="button" id="detach">Remove</button></div>
           <div class="fmsg" id="cfMsg" role="status"></div>
           <button class="btn btn-light" type="submit" style="justify-self:start">Send message</button>
         </form>

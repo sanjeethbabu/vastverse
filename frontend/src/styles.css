@@ -109,7 +109,7 @@ html.hmode .al-bottom{justify-content:flex-end}
   .panel .steps{grid-template-columns:1fr!important}
   .panel .steps::before{left:23px;right:auto;top:0;bottom:0;width:1px;height:auto}
   .panel .step{padding:0 0 0 64px}
-  .panel .est,.panel .contact-grid,.panel .explorer,.panel .why,.panel .al-row{grid-template-columns:1fr!important}
+  .panel .contact-grid,.panel .explorer,.panel .why,.panel .al-row{grid-template-columns:1fr!important}
   .panel .tablist{flex-direction:row;flex-wrap:wrap}
   .panel .feat{grid-template-columns:1fr}
   .panel .feat .art{min-height:200px;border-right:none;border-bottom:1px solid var(--line)}
@@ -219,26 +219,6 @@ html.hmode .al-bottom{justify-content:flex-end}
 .step ul{list-style:none;display:flex;flex-wrap:wrap;gap:6px}
 .step li{font-size:.8rem;padding:5px 10px;border-radius:999px;border:1px solid var(--line2);color:#D4DCEC}
 
-/* estimator */
-.est{display:grid;grid-template-columns:1.25fr .9fr;gap:20px;margin-top:22px;align-items:stretch}
-.est fieldset{border:none;margin-bottom:16px}
-.est legend{font-size:.86rem;color:var(--steel);margin-bottom:8px}
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip-in{position:relative}
-.chip-in input{position:absolute;opacity:0;pointer-events:none}
-.chip-in span{display:block;padding:8px 14px;border-radius:999px;border:1px solid var(--line2);font-size:.86rem;color:#D4DCEC;cursor:pointer;transition:all .2s;background:rgba(0,0,0,.3)}
-.chip-in span:hover{border-color:var(--light)}
-.chip-in input:checked + span{background:var(--light);color:#000;border-color:var(--light)}
-.chip-in input:focus-visible + span{outline:2px solid var(--spark);outline-offset:2px}
-.result{display:flex;flex-direction:column}
-.result .range{font-family:var(--display);font-size:clamp(1.8rem,3.2vw,2.7rem);letter-spacing:-.04em;line-height:1.05;margin:6px 0 10px}
-.result .meta{display:flex;gap:18px;color:#C9D2E4;font-size:.92rem;margin-bottom:14px}
-.result ul{list-style:none;border-top:1px solid var(--line);padding-top:10px;margin-bottom:12px;max-height:22vh;overflow:auto}
-.result li{display:flex;justify-content:space-between;font-size:.88rem;padding:4px 0;color:#C9D2E4}
-.result li span:last-child{color:var(--steel)}
-.result .note{font-size:.82rem;color:var(--steel);margin-bottom:14px}
-.result .btn{margin-top:auto;align-self:flex-start}
-
 /* CTA */
 .trust{display:flex;flex-wrap:wrap;gap:20px;margin-top:24px;color:#C9D2E4;font-size:.92rem}
 .trust span{display:flex;align-items:center;gap:10px}
@@ -262,6 +242,7 @@ html.hmode .al-bottom{justify-content:flex-end}
 .stack .chip{padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.07);font-size:.85rem}
 .stack em{font-style:normal;color:var(--steel);font-size:.85rem;margin-left:6px}
 .why{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;perspective:1200px}
+.vision-mission{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));max-width:1000px}
 .why h3,.values h3{font-size:1.1rem;margin-bottom:8px}
 .why p,.values p{color:var(--steel);font-size:.95rem}
 
@@ -323,9 +304,6 @@ textarea{min-height:clamp(90px,14vh,140px);resize:vertical}
 .fmsg{display:none;padding:12px 16px;border-radius:12px;font-size:.92rem;background:rgba(159,208,255,.1);border:1px solid rgba(159,208,255,.4)}
 .fmsg.show{display:block}
 .fmsg.err{background:rgba(255,143,143,.1);border-color:rgba(255,143,143,.45)}
-.attached{display:none;font-size:.86rem;padding:10px 14px;border-radius:12px;border:1px solid rgba(159,208,255,.35);background:rgba(159,208,255,.06);justify-content:space-between;align-items:center;gap:10px}
-.attached.show{display:flex}
-.attached button{background:none;border:none;color:var(--steel);cursor:pointer;text-decoration:underline}
 .chan{display:grid;gap:12px}
 .chan .card{padding:20px 22px}
 .chan small{color:var(--spark);font-size:.84rem}
@@ -372,7 +350,7 @@ textarea{min-height:clamp(90px,14vh,140px);resize:vertical}
 @media (max-width:900px){
   .menu{display:none}.burger{display:block}
   .scrim{background:rgba(0,0,0,.42)}
-  .caps,.why,.est,.contact-grid,.explorer{grid-template-columns:1fr}
+  .caps,.why,.contact-grid,.explorer{grid-template-columns:1fr}
   .svc-grid{grid-template-columns:1fr 1fr}
   .ind-grid{grid-template-columns:1fr 1fr}
   .stats{grid-template-columns:1fr 1fr}
