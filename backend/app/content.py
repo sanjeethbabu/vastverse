@@ -181,11 +181,9 @@ TECH = ["TypeScript", "React", "Next.js", "Node.js", "Python", "FastAPI", "Postg
         "React Native", "AWS", "Docker", "Kubernetes", "Stripe", "Redis", "Three.js"]
 
 CONTACT = {
-    "email": "hello@vastverse.com",
-    "phone": "+1 (555) 123-4567",
-    "hours": "Monday to Friday, 9am to 6pm EST",
-    "address": "123 Innovation Drive, San Francisco, CA 94105, USA",
-    "twitter": "vastversetech",
+    "email": "info@vastverse.in",
+    "phone": "+91-6379588598",
+    "address": "Vedhas Complex, Dindigul",
 }
 
 # Indicative pricing used by the project estimator (USD). The frontend uses the

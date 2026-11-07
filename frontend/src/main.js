@@ -47,17 +47,14 @@ function renderContent() {
   $('#svcSelect').innerHTML = '<option value="">Choose a service</option>' + C.services.map(s => `<option>${esc(s.name)}</option>`).join('') + '<option>Not sure yet</option>';
   const ct = C.contact;
   $('#chan').innerHTML = `<div class="card" data-reveal><small>Email</small><b>${esc(ct.email)}</b><span>Best for detailed inquiries</span></div>
-    <div class="card" data-reveal><small>Phone</small><b>${esc(ct.phone)}</b><span>${esc(ct.hours)}</span></div>
+    <div class="card" data-reveal><small>Phone</small><b>${esc(ct.phone)}</b><span>Call us to discuss your project</span></div>
     <div class="card" data-reveal><small>Office</small><b>${esc(ct.address)}</b><span>By appointment only</span></div>`;
   $('#next').innerHTML = C.nextSteps.map(n => `<div class="card" data-reveal><h3>${esc(n[0])}</h3><p>${esc(n[1])}</p></div>`).join('');
   $('#faq').innerHTML = C.faq.map((f, i) => `<div class="qa"><button aria-expanded="false" aria-controls="ans${i}" id="q${i}">${esc(f[0])}<i aria-hidden="true"></i></button><div class="ans" id="ans${i}" role="region" aria-labelledby="q${i}"><p>${esc(f[1])}</p></div></div>`).join('');
   // footer panels
   const foot = `<div class="pin" style="max-width:1100px"><div class="wm">vastverse</div><div class="fcols">
-    <div><p>We turn bold ideas into intelligent digital solutions.</p><p class="muted" style="margin-top:10px">Vastverse — Innovation from Vision.</p></div>
-    <div><h4>Company</h4><a href="#services" data-link>What we do</a><a href="#projects" data-link>Projects</a><a href="#careers" data-link>Careers</a><a href="#insights" data-link>Insights</a><a href="#contact" data-link>Contact</a></div>
-    <div><h4>Services</h4>${C.services.slice(0, 5).map((s, i) => `<a href="#services" data-link data-svc="${i}">${esc(s.name)}</a>`).join('')}</div>
-    <div><h4>Get in touch</h4><p>${esc(ct.address)}</p><p style="margin-top:10px">${esc(ct.phone)}<br>${esc(ct.email)}</p><a href="https://twitter.com/${esc(ct.twitter)}">@${esc(ct.twitter)}</a></div>
-  </div><div class="fbase"><span>© ${new Date().getFullYear()} vastverse. All rights reserved.</span><span>Built with Three.js, GSAP and FastAPI.</span></div></div>`;
+    <div><h4>Get in touch</h4><p>${esc(ct.address)}<br>${esc(ct.phone)}<br>${esc(ct.email)}</p></div>
+  </div><div class="fbase"><span>© ${new Date().getFullYear()} vastverse. All rights reserved.</span></div></div>`;
   $$('[data-footer]').forEach(f => f.innerHTML = foot);
   splitHeadings(); initArt(document, REDUCE);
 }

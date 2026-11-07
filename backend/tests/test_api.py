@@ -42,7 +42,7 @@ def test_estimate(client):
 
 def test_contact_without_email_config_is_honest(client):
     r = client.post("/api/contact", json=LEAD)
-    assert r.status_code == 503 and "hello@vastverse.com" in r.json()["detail"]
+    assert r.status_code == 503 and "info@vastverse.in" in r.json()["detail"]
 
 
 def test_contact_emails_the_team(client, sent):
@@ -72,7 +72,7 @@ def test_smtp_failure_reports_error(client, monkeypatch):
     def boom(*a, **k): raise OSError("smtp down")
     monkeypatch.setattr(mailer, "send", boom)
     r = client.post("/api/contact", json=LEAD)
-    assert r.status_code == 502 and "hello@vastverse.com" in r.json()["detail"]
+    assert r.status_code == 502 and "info@vastverse.in" in r.json()["detail"]
 
 
 def test_newsletter(client, sent):

@@ -32,17 +32,20 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:500;letter-spacing:-.025em;li
 .ptip span{color:var(--spark)}
 
 /* ---------- hand cursor ---------- */
-.cursor{position:fixed;left:0;top:0;width:52px;height:57px;transform-origin:21px 3px;z-index:90;pointer-events:none;display:none;will-change:transform}
-.cursor .hand{width:100%;height:100%;transform-origin:21px 3px;transition:transform .25s cubic-bezier(.2,.7,.2,1),opacity .2s}
+.cursor{position:fixed;left:0;top:0;width:34px;height:37px;transform-origin:14px 2px;z-index:90;pointer-events:none;display:none;will-change:transform}
+.cursor .hand{width:100%;height:100%;transform-origin:14px 2px;transition:transform .25s cubic-bezier(.2,.7,.2,1),opacity .2s}
 .cursor svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 6px rgba(159,208,255,.35))}
 .cursor .tip{transition:r .25s}
 .cursor.hover .hand{transform:scale(.88) rotate(-8deg)}
 .cursor.hover .tip{r:5}
 .cursor.press .hand{transform:scale(.78) translateY(3px)}
-.cursor.text .hand,.cursor.away .hand{opacity:0}
+.cursor.away .hand{opacity:0}
 .tap{position:fixed;left:0;top:0;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;border:1.5px solid rgba(159,208,255,.9);pointer-events:none;z-index:89;animation:tap .6s ease-out forwards}
 @keyframes tap{to{transform:scale(7);opacity:0}}
-@media (pointer:fine){.cursor{display:block} html.hand-cursor,html.hand-cursor a,html.hand-cursor button,html.hand-cursor label,html.hand-cursor .tilt{cursor:none}}
+@media (pointer:fine){
+  .cursor{display:block}
+  html.hand-cursor,html.hand-cursor *{cursor:none!important}
+}
 
 /* ---------- nav ---------- */
 header.nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:background .35s,border-color .35s;border-bottom:1px solid transparent}
@@ -50,7 +53,8 @@ header.nav.solid{background:rgba(0,0,0,.6);backdrop-filter:blur(16px);-webkit-ba
 .nav-in{display:flex;align-items:center;justify-content:space-between;height:74px;padding:0 max(24px,4vw)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
 .brand svg{width:34px;height:34px;flex:none}
-.brand b{display:block;font-family:var(--display);font-weight:500;font-size:1.08rem;letter-spacing:-.01em;line-height:1.1}
+.brand b{display:block;font-family:var(--body);font-weight:700;font-size:1.7rem;letter-spacing:-.055em;line-height:1.1}
+.brand .brand-comma{color:#A48D18;letter-spacing:0;margin-left:1px}
 .brand small{display:block;font-size:.72rem;color:var(--steel)}
 .menu{display:flex;align-items:center;gap:4px;list-style:none}
 .menu a.lk{display:block;padding:10px 16px;border-radius:10px;text-decoration:none;color:var(--steel);font-size:.95rem;transition:color .2s,background .2s}
@@ -85,6 +89,7 @@ header.nav.solid{background:rgba(0,0,0,.6);backdrop-filter:blur(16px);-webkit-ba
 .page.active{display:block}
 .hwrap{position:relative}
 .panel{position:relative;padding:96px 22px 70px}
+.panel.values-panel{min-height:0;padding:72px 7vw 56px}
 .pin{max-width:1180px;margin:0 auto;width:100%}
 html.hmode .hwrap{height:100vh;overflow:hidden}
 html.hmode .htrack{display:flex;height:100vh;width:max-content;will-change:transform}
@@ -243,6 +248,8 @@ html.hmode .al-bottom{justify-content:flex-end}
 .stack em{font-style:normal;color:var(--steel);font-size:.85rem;margin-left:6px}
 .why{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;perspective:1200px}
 .vision-mission{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));max-width:1000px}
+.mission-panel .vision-mission{align-items:start}
+.mission-panel .vision-mission > :nth-child(2){margin-top:32px}
 .why h3,.values h3{font-size:1.1rem;margin-bottom:8px}
 .why p,.values p{color:var(--steel);font-size:.95rem}
 
@@ -325,13 +332,15 @@ textarea{min-height:clamp(90px,14vh,140px);resize:vertical}
 .qa .ans p{color:var(--steel);padding-bottom:18px;max-width:70ch}
 
 /* footer panel */
-.fpanel .wm{font-family:var(--display);font-weight:700;font-size:clamp(3rem,10vw,9rem);letter-spacing:-.06em;line-height:.9;background:linear-gradient(180deg,rgba(243,246,255,.9),rgba(159,208,255,.05));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:30px}
-.fcols{display:grid;grid-template-columns:1.2fr 1fr 1fr 1.2fr;gap:30px}
-.fcols h4{font-family:var(--body);font-size:.88rem;font-weight:600;color:var(--steel);margin-bottom:12px}
-.fcols a{display:block;text-decoration:none;color:#C9D2E4;padding:4px 0;font-size:.94rem}
+.fpanel .wm{font-family:var(--display);font-weight:700;font-size:clamp(3rem,10vw,9rem);letter-spacing:-.06em;line-height:.9;text-align:center;background:linear-gradient(180deg,rgba(243,246,255,.9),rgba(159,208,255,.05));-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:30px}
+.fcols{display:grid;grid-template-columns:1fr;gap:0;text-align:center}
+.fcols h4{font-family:var(--body);font-size:.88rem;font-weight:600;color:var(--steel);margin-bottom:6px}
+.fcols a{display:block;text-decoration:none;color:#C9D2E4;padding:2px 0;font-size:.94rem}
 .fcols a:hover{color:#fff}
-.fcols p{color:#C9D2E4;font-size:.94rem}
-.fbase{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:30px;padding-top:18px;border-top:1px solid var(--line);color:var(--steel);font-size:.86rem}
+.fcols p{color:#C9D2E4;font-size:.94rem;line-height:1.45}
+.fbase{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 12px;margin-top:14px;padding-top:10px;border-top:1px solid var(--line);color:var(--steel);font-size:.86rem;text-align:center}
+.panel.fpanel{min-height:0;padding:42px 7vw 24px}
+.fpanel .wm{margin-bottom:16px}
 
 /* modal */
 .modal{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.7);backdrop-filter:blur(10px)}
@@ -351,6 +360,7 @@ textarea{min-height:clamp(90px,14vh,140px);resize:vertical}
   .menu{display:none}.burger{display:block}
   .scrim{background:rgba(0,0,0,.42)}
   .caps,.why,.contact-grid,.explorer{grid-template-columns:1fr}
+  .mission-panel .vision-mission > :nth-child(2){margin-top:0}
   .svc-grid{grid-template-columns:1fr 1fr}
   .ind-grid{grid-template-columns:1fr 1fr}
   .stats{grid-template-columns:1fr 1fr}

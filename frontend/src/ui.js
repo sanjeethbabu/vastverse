@@ -10,8 +10,8 @@ export function initCursor() {
   addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; cur.classList.remove('away'); }, { passive: true });
   document.addEventListener('pointerleave', () => cur.classList.add('away'));
   document.addEventListener('pointerover', e => {
-    cur.classList.toggle('hover', !!e.target.closest('a,button,.tilt,select,label,.film'));
-    cur.classList.toggle('text', !!e.target.closest('input[type=email],input:not([type]),textarea'));
+    const target = e.target instanceof Element ? e.target : null;
+    cur.classList.toggle('hover', !!target?.closest('a,button,.tilt,select,label,.film'));
   });
   addEventListener('pointerdown', e => {
     if (e.pointerType !== 'mouse') return; cur.classList.add('press');
@@ -21,7 +21,7 @@ export function initCursor() {
   addEventListener('pointerup', () => cur.classList.remove('press'));
   (function loop() {
     const vx = tx - cx; cx += vx * .35; cy += (ty - cy) * .35; rot += (Math.max(-18, Math.min(18, vx * .6)) - rot) * .15;
-    cur.style.transform = `translate(${cx - 21}px,${cy - 3}px) rotate(${rot}deg)`; requestAnimationFrame(loop);
+    cur.style.transform = `translate(${cx - 14}px,${cy - 2}px) rotate(${rot}deg)`; requestAnimationFrame(loop);
   })();
 }
 export function setPlanetCursor(on) { $('#cur').classList.toggle('hover', on); }
