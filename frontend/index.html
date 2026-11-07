@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vastverse — Innovation from Vision</title>
+<meta name="description" content="We turn bold ideas into intelligent digital solutions: applied AI, custom software, web, mobile and SaaS products.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+<div id="universe" aria-hidden="true"></div>
+<div class="scrim" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><i id="prog"></i></div>
+<div class="ptip" id="ptip" aria-hidden="true"></div>
+<div class="cursor" id="cur" aria-hidden="true"><div class="hand"><svg viewBox="0 0 42 46" fill="none">
+  <defs><radialGradient id="tipG"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#CFE6FF" stop-opacity=".9"/><stop offset="1" stop-color="#5BA8FF" stop-opacity="0"/></radialGradient></defs>
+  <path d="M14 28.5V5a3 3 0 0 1 6 0v12a3 3 0 0 1 6 0v2a2.8 2.8 0 0 1 5.6 0v2.5a2.6 2.6 0 0 1 5.2 0V31c0 6-3.5 10-9 10H19c-3.6 0-5.6-1.6-7.8-4.6L5.4 28.6a2.7 2.7 0 0 1 4.3-3.2L14 29.5z" fill="rgba(8,12,20,.78)" stroke="#EAF4FF" stroke-width="1.3" stroke-linejoin="round"/>
+  <path d="M14 11.5h6M14 18h6M20 17v6M26 19v5.5M31.6 21.5v5" stroke="#9FD0FF" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+  <circle cx="17" cy="9" r=".9" fill="#9FD0FF"/><circle cx="17" cy="15" r=".9" fill="#9FD0FF"/>
+  <circle class="tip" cx="17" cy="2.5" r="3.5" fill="url(#tipG)"/>
+</svg></div></div>
+
+<header class="nav" id="nav">
+  <div class="nav-in">
+    <a class="brand" href="#home" data-link aria-label="Vastverse home">
+      <svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><circle cx="20" cy="20" r="18" stroke="#9AA6BE" stroke-width="1.2"/><circle cx="20" cy="20" r="11" stroke="#9FD0FF" stroke-width="1.2" stroke-dasharray="2.2 2.6"/><circle cx="21.5" cy="19" r="4.6" fill="#F3F6FF"/></svg>
+      <span><b>vastverse</b><small>innovation from vision</small></span>
+    </a>
+    <ul class="menu">
+      <li><a class="lk" href="#services" data-link data-r="services">What we do</a></li>
+      <li><a class="lk" href="#projects" data-link data-r="projects">Projects</a></li>
+      <li><a class="lk" href="#careers" data-link data-r="careers">Careers</a></li>
+      <li><a class="lk" href="#insights" data-link data-r="insights">Insights</a></li>
+      <li style="margin-left:10px"><a class="btn btn-light btn-sm" href="#contact" data-link>Let's talk</a></li>
+    </ul>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="drawer" aria-label="Open menu"><i></i><i></i></button>
+  </div>
+</header>
+<div class="drawer-bd" id="drawerBd"></div>
+<nav class="drawer" id="drawer" aria-label="Menu">
+  <a href="#home" data-link data-r="home">Home</a>
+  <a href="#services" data-link data-r="services">What we do</a>
+  <a href="#projects" data-link data-r="projects">Projects</a>
+  <a href="#careers" data-link data-r="careers">Careers</a>
+  <a href="#insights" data-link data-r="insights">Insights</a>
+  <a class="btn btn-light btn-sm" href="#contact" data-link>Let's talk</a>
+</nav>
+
+<div id="app">
+
+<!-- ================= HOME ================= -->
+<main class="page" data-page="home">
+  <section class="film" id="film">
+    <canvas id="filmCv"></canvas>
+    <div class="glow" id="glow"></div>
+    <canvas id="syn"></canvas>
+    <div class="shade"></div>
+    <div class="flash" id="flash"></div>
+    <div class="loader" id="loader"><span>Loading the experience</span><i id="loadBar"></i></div>
+    <div class="fhint" id="fhint">Bring your hand to the light. Click to send a pulse.</div>
+    <div class="layer">
+      <div class="h-intro" id="hIntro">
+        <h1 class="split">Your next big idea, <b>built to go further.</b></h1>
+        <p>We turn bold ideas into intelligent digital solutions: applied AI, custom software and digital products engineered for lasting impact.</p>
+        <div class="h-actions">
+          <a class="btn btn-light" href="#contact" data-link>Let's build something</a>
+          <a class="btn btn-line" href="#services" data-link>Explore what we do</a>
+        </div>
+        <div class="tags"><span class="tag">Applied AI</span><span class="tag">Custom software</span><span class="tag">Digital products</span></div>
+      </div>
+      <div class="h-side h-left" id="hLeft"><h2>Human vision</h2><p>Your ideas, your goals and the know-how of your business.</p></div>
+      <div class="h-side h-right" id="hRight"><h2>Machine intelligence</h2><p>AI that learns, reasons and acts on your behalf.</p></div>
+      <div class="h-meet" id="hMeet"><h2>Thoughtful tech. <b>Lasting impact.</b></h2></div>
+      <div class="cue" id="cue"><span>Scroll to connect</span><i></i></div>
+    </div>
+  </section>
+
+  <div class="hwrap"><div class="htrack">
+    <section class="panel al-bottom" data-name="Welcome" data-shape="logo" data-side="1">
+      <div class="pin col-w">
+        <span class="kicker">Welcome to the Vastverse</span>
+        <h2 class="big split">Innovation <b>from vision.</b></h2>
+        <p class="lede" data-reveal>We are a technology and digital innovation company. We build custom software, web and mobile apps, SaaS platforms and next-generation AI that help startups, entrepreneurs and established businesses turn ideas into future-ready technology.</p>
+        <div class="stats" id="stats" data-reveal></div>
+      </div>
+    </section>
+    <section class="panel al-right" data-name="Why Vastverse" data-shape="galaxy" data-side="-1">
+      <div class="pin col-w">
+        <span class="kicker">Why Vastverse</span>
+        <h2 class="h2 split">Engineering that thinks ahead.</h2>
+        <div class="caps" id="caps"></div>
+        <div class="principles" id="principles" data-reveal></div>
+      </div>
+    </section>
+    <section class="panel" data-name="Services" data-shape="knot" data-side="1">
+      <div class="pin" style="max-width:none">
+        <div class="row-head"><div><span class="kicker">Services</span><h2 class="h2 split">Everything you need to launch and grow.</h2></div><a class="btn btn-line" href="#services" data-link data-reveal>View all services</a></div>
+        <div class="svc-grid" id="svcGrid"></div>
+      </div>
+    </section>
+    <section class="panel al-bottom" data-name="Solutions" data-shape="wave" data-side="0">
+      <div class="pin" style="max-width:none">
+        <span class="kicker">Digital solutions we build</span>
+        <h2 class="h2 split">Products that run your business.</h2>
+        <div class="sols" id="sols"></div>
+      </div>
+    </section>
+    <section class="panel" data-name="Industries" data-shape="atom" data-side="1">
+      <div class="pin col-w">
+        <span class="kicker">Industries</span>
+        <h2 class="h2 split">Built for the way your industry works.</h2>
+        <div class="ind-grid" id="indGrid"></div>
+        <div class="marquee" aria-label="Technologies we use"><div class="row" id="mq"></div></div>
+      </div>
+    </section>
+    <section class="panel wide" data-name="Process" data-shape="helix" data-side="0">
+      <div class="pin" style="max-width:none">
+        <span class="kicker">How we work</span>
+        <h2 class="h2 split">From first call to launch, and beyond.</h2>
+        <div class="steps" id="steps"></div>
+      </div>
+    </section>
+    <section class="panel" data-name="Estimate" data-shape="globe" data-side="0">
+      <div class="pin">
+        <span class="kicker">Project estimator</span>
+        <h2 class="h2 split">What could your project cost?</h2>
+        <p class="lede" data-reveal>Pick what you need and get an instant, indicative range. Send it to us with your enquiry when you're ready.</p>
+        <form class="est" id="est" onsubmit="return false">
+          <div class="card" data-reveal>
+            <fieldset><legend>Service</legend><div class="chips" id="estSvc"></div></fieldset>
+            <fieldset><legend>Features</legend><div class="chips" id="estFeat"></div></fieldset>
+            <div class="row2">
+              <fieldset><legend>Scale</legend><div class="chips" id="estScale"></div></fieldset>
+              <fieldset><legend>Timeline</legend><div class="chips" id="estTime"></div></fieldset>
+            </div>
+          </div>
+          <div class="card result" id="estOut" data-reveal aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+    <section class="panel al-center" data-name="Let's talk" data-shape="infinity" data-side="0">
+      <div class="pin col-w" style="margin:0 auto">
+        <h2 class="big split">Have an idea worth building? <b>Let's make it happen.</b></h2>
+        <div class="h-actions" style="justify-content:center" data-reveal>
+          <a class="btn btn-light" href="#contact" data-link>Discuss your project</a>
+          <a class="btn btn-line" href="#contact" data-link>Contact our team</a>
+        </div>
+        <div class="trust" style="justify-content:center" data-reveal><span>Start with a conversation</span><span>NDA available on request</span><span>Clear next steps</span></div>
+      </div>
+    </section>
+    <section class="panel fpanel" data-name="Footer" data-footer></section>
+  </div></div>
+</main>
+
+<!-- ================= SERVICES ================= -->
+<main class="page" data-page="services">
+  <div class="hwrap"><div class="htrack">
+    <section class="panel narrow" data-name="What we do" data-shape="lattice" data-side="1">
+      <div class="pin col">
+        <span class="kicker">What we do</span>
+        <h1 class="big split">Technology built around <b>your business.</b></h1>
+        <p class="lede" data-reveal>Explore the capabilities we use to turn complex challenges into scalable, intelligent products.</p>
+      </div>
+    </section>
+    <section class="panel" data-name="Capabilities" data-shape="neural" data-side="0">
+      <div class="explorer" data-reveal>
+        <div class="tablist" role="tablist" aria-label="Service categories" id="tabs"></div>
+        <div class="card detail" id="detail" role="tabpanel"></div>
+      </div>
+    </section>
+    <section class="panel" data-name="Our way" data-shape="funnel" data-side="-1">
+      <div class="pin">
+        <span class="kicker">The Vastverse way</span>
+        <h2 class="h2 split">One partner from idea to scale.</h2>
+        <div class="why">
+          <div class="card tilt" data-reveal><h3>Senior, cross-functional team</h3><p>Strategists, designers and engineers work together from day one, so nothing gets lost in hand-offs.</p></div>
+          <div class="card tilt" data-reveal><h3>Transparent delivery</h3><p>Working demos every sprint, shared roadmaps and clear reporting on scope, time and budget.</p></div>
+          <div class="card tilt" data-reveal><h3>Long-term ownership</h3><p>Clean, documented code and full hand-over, or ongoing support if you want us to keep running it.</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="panel fpanel" data-name="Footer" data-footer></section>
+  </div></div>
+</main>
+
+<!-- ================= PROJECTS ================= -->
+<main class="page" data-page="projects">
+  <div class="hwrap"><div class="htrack">
+    <section class="panel narrow" data-name="Featured work" data-shape="globe" data-side="1">
+      <div class="pin col">
+        <span class="kicker">Featured work</span>
+        <h1 class="big split">Selected projects and <b>case studies.</b></h1>
+        <p class="lede" data-reveal>Work across industries and technologies. Real client projects are confidential, so these demonstrate our capabilities and approach.</p>
+        <div class="filters" id="pfilters" role="group" aria-label="Filter projects" data-reveal></div>
+      </div>
+    </section>
+    <section class="panel wide" data-name="Projects" data-shape="galaxy" data-side="0">
+      <div class="strip" id="projGrid"></div>
+      <p class="note" data-reveal>These are demonstration projects. Real client work is confidential and shared under NDA.</p>
+    </section>
+    <section class="panel fpanel" data-name="Footer" data-footer></section>
+  </div></div>
+</main>
+
+<!-- ================= CAREERS ================= -->
+<main class="page" data-page="careers">
+  <div class="hwrap"><div class="htrack">
+    <section class="panel narrow" data-name="Careers" data-shape="helix" data-side="1">
+      <div class="pin col">
+        <span class="kicker">Careers</span>
+        <h1 class="big split">Join <b>our team.</b></h1>
+        <p class="lede" data-reveal>We're a team of engineers, designers and problem-solvers building intelligent products for businesses around the world.</p>
+      </div>
+    </section>
+    <section class="panel" data-name="Openings" data-shape="atom" data-side="0">
+      <div class="pin al-row" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:center;max-width:1100px">
+        <div class="card empty" data-reveal>
+          <div class="orb"></div>
+          <h2>No open positions right now.</h2>
+          <p>Thank you for your interest in Vastverse. We aren't recruiting at the moment. We'll update this page when recruitment begins, so please check back later.</p>
+          <a class="btn btn-light" href="#contact" data-link>Contact our team</a>
+        </div>
+        <div class="values" id="values"></div>
+      </div>
+    </section>
+    <section class="panel fpanel" data-name="Footer" data-footer></section>
+  </div></div>
+</main>
+
+<!-- ================= INSIGHTS ================= -->
+<main class="page" data-page="insights">
+  <div class="hwrap"><div class="htrack">
+    <section class="panel narrow" data-name="Insights" data-shape="neural" data-side="1">
+      <div class="pin col">
+        <span class="kicker">Insights</span>
+        <h1 class="big split">Technical insights and <b>thought leadership.</b></h1>
+        <p class="lede" data-reveal>Deep dives into the technologies, patterns and decisions in modern software, written by the engineers building production systems.</p>
+      </div>
+    </section>
+    <section class="panel" data-name="Featured" data-shape="knot" data-side="-1">
+      <div class="filters" id="ifilters" role="group" aria-label="Filter articles" data-reveal></div>
+      <article class="card feat tilt" id="feat" data-reveal></article>
+    </section>
+    <section class="panel wide" data-name="Articles" data-shape="funnel" data-side="0">
+      <div class="strip" id="posts"></div>
+    </section>
+    <section class="panel narrow" data-name="Newsletter" data-shape="infinity" data-side="1">
+      <div class="pin col card news" data-reveal>
+        <h2 class="h2">Get insights delivered.</h2>
+        <p class="muted">A monthly technical digest for engineers and business leaders.</p>
+        <form id="newsForm" novalidate><input type="email" name="email" placeholder="you@company.com" aria-label="Email address" required><button class="btn btn-light" type="submit">Subscribe</button></form>
+        <div class="fmsg" id="newsMsg" role="status" style="margin-top:12px"></div>
+      </div>
+    </section>
+    <section class="panel fpanel" data-name="Footer" data-footer></section>
+  </div></div>
+</main>
+
+<!-- ================= CONTACT ================= -->
+<main class="page" data-page="contact">
+  <div class="hwrap"><div class="htrack">
+    <section class="panel narrow" data-name="Contact" data-shape="infinity" data-side="1">
+      <div class="pin col">
+        <span class="kicker">Contact</span>
+        <h1 class="big split">Let's start a <b>conversation.</b></h1>
+        <p class="lede" data-reveal>Discuss a project, ask for technical guidance or just say hello. We reply within 24 hours.</p>
+      </div>
+    </section>
+    <section class="panel" data-name="Message" data-shape="globe" data-side="0">
+      <div class="pin contact-grid">
+        <form class="card cf" id="cf" novalidate data-reveal>
+          <h2 style="font-size:1.4rem">Send us a message</h2>
+          <div class="row2">
+            <label>Full name <span class="req">*</span><input name="name" autocomplete="name" required></label>
+            <label>Email address <span class="req">*</span><input name="email" type="email" autocomplete="email" required></label>
+          </div>
+          <div class="row2">
+            <label>Company or organization<input name="company" autocomplete="organization"></label>
+            <label>Service of interest <span class="req">*</span><select name="service" id="svcSelect" required><option value="">Choose a service</option></select></label>
+          </div>
+          <label>Project details <span class="req">*</span><textarea name="details" required placeholder="Timeline, budget range and key requirements (at least 20 characters)"></textarea></label>
+          <label class="hp" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off"></label>
+          <div class="attached" id="attached"><span></span><button type="button" id="detach">Remove</button></div>
+          <div class="fmsg" id="cfMsg" role="status"></div>
+          <button class="btn btn-light" type="submit" style="justify-self:start">Send message</button>
+        </form>
+        <div class="chan" id="chan"></div>
+      </div>
+    </section>
+    <section class="panel" data-name="Next steps" data-shape="lattice" data-side="0">
+      <div class="pin">
+        <span class="kicker">What happens next</span>
+        <h2 class="h2 split">Four steps to a clear proposal.</h2>
+        <div class="next" id="next"></div>
+      </div>
+    </section>
+    <section class="panel" data-name="FAQ" data-shape="galaxy" data-side="1">
+      <div class="pin col-w">
+        <span class="kicker">Questions</span>
+        <h2 class="h2 split">Frequently asked questions.</h2>
+        <div class="faq" id="faq"></div>
+      </div>
+    </section>
+    <section class="panel fpanel" data-name="Footer" data-footer></section>
+  </div></div>
+</main>
+</div>
+
+<nav class="jmap hide" id="jmap" aria-label="Sections"><span class="lbl" id="jlbl"></span><div class="dots" id="jdots"></div></nav>
+
+<div class="burst-tip" id="burstTip" aria-hidden="true">Tip: click empty space to burst the shape. Scroll to zoom through it.</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="sheet" id="sheet"><button class="x" id="mClose" aria-label="Close">×</button><div id="mBody"></div></div>
+</div>
+
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>

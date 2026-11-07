@@ -1,0 +1,217 @@
+"""Single source of truth for all site content.
+
+The frontend fetches this from GET /api/content. `python -m app.export_content`
+also writes it to frontend/src/content.json so the static build has the same
+content when no API is reachable.
+"""
+
+STATS = [
+    {"value": 9, "suffix": "+", "decimals": 0, "label": "Digital solutions delivered"},
+    {"value": 99.6, "suffix": "%", "decimals": 1, "label": "On-time delivery"},
+    {"value": 10, "suffix": "+", "decimals": 0, "label": "Engineers and designers"},
+    {"value": 7, "suffix": "", "decimals": 0, "label": "Areas of expertise"},
+]
+
+CAPABILITIES = [
+    {"title": "AI-first thinking", "text": "We integrate artificial intelligence as a core capability, not an afterthought. From custom ML models to AI agents and generative applications, we build intelligence into every layer of your product."},
+    {"title": "Custom-built solutions", "text": "No templates, no compromise. Every solution is architected from the ground up to match your unique business requirements, workflows and growth trajectory."},
+    {"title": "Business-focused engineering", "text": "We measure success by your business outcomes, not lines of code. Our engineering decisions are driven by ROI, user impact and long-term value creation."},
+    {"title": "Scalable architecture", "text": "Built to grow. We design systems that scale horizontally and vertically, handling traffic spikes, data growth and feature expansion without rewrites."},
+]
+
+PRINCIPLES = [
+    ["Rapid prototyping", "Validate ideas early"],
+    ["Security first", "Security by design"],
+    ["Data-driven", "Clear success measures"],
+    ["Clean code", "Maintainable and documented"],
+]
+
+SERVICES = [
+    {"id": "ai", "name": "AI & Intelligent Automation", "world": "Planet Intelligence",
+     "short": "Agents, ML models and automation built into your operations.",
+     "summary": "AI agents, machine learning and automation that take repetitive work off your team and add real intelligence to your products and operations.",
+     "capabilities": ["AI agents and assistants", "Autonomous multi-step AI systems", "Workflow and process automation", "Custom machine learning models", "Generative AI and LLM applications", "Knowledge assistants (RAG)", "Document and data extraction", "Predictive analytics", "AI integration into existing products"],
+     "tools": ["Python", "PyTorch", "TensorFlow", "LangChain", "Vector databases"]},
+    {"id": "custom", "name": "Custom Software Development", "world": "Planet Forge",
+     "short": "Business applications, portals and legacy modernization.",
+     "summary": "Custom business applications, internal tools, portals, legacy modernization and database-driven systems, built to your specific requirements.",
+     "capabilities": ["Custom software development", "Business application development", "Internal business tools and portals", "Workflow and process management systems", "Database-driven applications", "Legacy system modernization", "Third-party API integration", "Software testing and quality assurance", "Software maintenance and enhancement"],
+     "tools": ["TypeScript", "Node.js", "React", "Next.js", "PostgreSQL"]},
+    {"id": "web", "name": "Web Development", "world": "Planet Web",
+     "short": "Fast, accessible websites, web apps and e-commerce.",
+     "summary": "High-performance websites, web applications and online stores that load fast, rank well and convert visitors into customers.",
+     "capabilities": ["Corporate and marketing websites", "Web applications and portals", "E-commerce development", "Headless CMS builds", "Progressive web apps", "Performance and Core Web Vitals", "Technical SEO", "Accessibility (WCAG)", "Analytics and tracking"],
+     "tools": ["Next.js", "React", "Tailwind CSS", "Headless CMS", "Vercel"]},
+    {"id": "mobile", "name": "Mobile App Development", "world": "Planet Mobile",
+     "short": "iOS, Android and cross-platform apps.",
+     "summary": "Native and cross-platform mobile apps with polished UX, offline support and everything needed for a smooth app store launch.",
+     "capabilities": ["iOS app development", "Android app development", "Cross-platform apps", "Mobile UI and UX design", "Offline-first data sync", "Push notifications", "In-app payments", "App store launch", "Ongoing app maintenance"],
+     "tools": ["Swift", "Kotlin", "Flutter", "React Native", "Firebase"]},
+    {"id": "saas", "name": "SaaS Product Development", "world": "Planet Scale",
+     "short": "Multi-tenant products, billing and analytics.",
+     "summary": "From MVP to scale: multi-tenant SaaS products with subscriptions, roles, analytics and integrations built in from the start.",
+     "capabilities": ["MVP development", "Multi-tenant architecture", "Subscriptions and billing", "Roles and permissions", "Admin dashboards", "Usage analytics", "Integrations and public APIs", "User onboarding flows", "Scaling and performance"],
+     "tools": ["Next.js", "Node.js", "PostgreSQL", "Stripe", "AWS"]},
+    {"id": "migration", "name": "Migration", "world": "Planet Transit",
+     "short": "Move to modern stacks and the cloud safely.",
+     "summary": "Safe, well-planned migrations from legacy systems and on-premise servers to modern stacks and the cloud, with minimal disruption.",
+     "capabilities": ["Legacy to modern stack", "Cloud migration", "Database migration", "Monolith to services", "Framework upgrades", "Data cleansing and mapping", "Zero-downtime cutover", "Rollback planning", "Post-migration tuning"],
+     "tools": ["AWS", "Azure", "Docker", "Kubernetes", "Terraform"]},
+    {"id": "support", "name": "Hosting, Maintenance & Technical Support", "world": "Planet Orbit",
+     "short": "Monitoring, updates and support that keep you running.",
+     "summary": "Managed hosting, monitoring and support that keep your products secure, fast and available, so your team can focus on growth.",
+     "capabilities": ["Managed cloud hosting", "Uptime monitoring and alerts", "Security patches and updates", "Backups and disaster recovery", "Performance tuning", "Bug fixes and enhancements", "SLA-based support", "DevOps and CI/CD", "Cloud cost optimization"],
+     "tools": ["AWS", "Docker", "GitHub Actions", "Grafana", "Cloudflare"]},
+]
+
+HOME_SERVICES = [
+    ["Website Development", "Fast, modern websites that turn visitors into customers.", "web"],
+    ["Mobile App Development", "iOS, Android and cross-platform apps.", "mobile"],
+    ["Software Development", "Reliable software for complex business needs.", "custom"],
+    ["Customized Software", "Tools shaped around your exact workflows.", "custom"],
+    ["Ecommerce Development", "Online stores built to sell and scale.", "web"],
+    ["ERP Development", "One system for operations, finance and people.", "custom"],
+    ["AI & Automation", "Agents and automation that save hours every week.", "ai"],
+    ["Search Engine Optimization", "Technical and content SEO that grows traffic.", "web"],
+    ["Social Media Management", "Consistent, on-brand presence across channels.", None],
+    ["Graphic Designing", "Brand, UI and marketing design that stands out.", None],
+]
+
+SOLUTIONS = [
+    {"title": "Web applications", "text": "Customer portals, dashboards and admin panels.", "art": "grid"},
+    {"title": "Mobile apps", "text": "iOS, Android and cross-platform solutions.", "art": "orbit"},
+    {"title": "ERP and CRM systems", "text": "Business process automation and management.", "art": "flow"},
+    {"title": "SaaS platforms", "text": "Multi-tenant products and subscription services.", "art": "stack"},
+]
+
+INDUSTRIES = [
+    ["Startups & Entrepreneurs", "MVPs, fundraising-ready products"],
+    ["Retail & E-Commerce", "Stores, marketplaces, inventory"],
+    ["Manufacturing & Industrial", "IoT, monitoring, ERP"],
+    ["Professional Services", "Practice and client management"],
+    ["Education & Training", "Learning platforms and LMS"],
+    ["Logistics & Transportation", "Routing, tracking, dispatch"],
+    ["Real Estate & Property", "Listings, CRM, tenant portals"],
+    ["Finance & Business Operations", "Fintech, automation, reporting"],
+    ["Healthcare & Hospitals", "Patient portals, scheduling"],
+]
+
+PROCESS = [
+    ["Discover", "Understand the challenge", "We learn how your business works, who you serve and what success should look like.", ["Business and user research", "Technical landscape review", "Requirements and success criteria"]],
+    ["Strategize", "Make a clear plan", "Together, we shape the solution, choose the right technology and map out delivery.", ["Solution architecture", "Technology and roadmap", "Milestones, risks and budget"]],
+    ["Design", "Make it intuitive", "We turn ideas into clear user journeys and testable designs before development begins.", ["User journeys and wireframes", "Interactive prototypes", "Accessible visual design"]],
+    ["Build & Validate", "Build with confidence", "We work in focused sprints, share progress often and validate quality as we go.", ["Agile development cycles", "Automated tests and code reviews", "Regular working demos"]],
+    ["Launch & Support", "Launch and keep improving", "We release carefully, monitor performance and stay alongside you as your product grows.", ["Reliable deployment", "Monitoring and team handover", "Ongoing support and improvement"]],
+]
+
+PROJECTS = [
+    {"title": "AI-Powered Customer Support Platform", "category": "SaaS / Customer Service", "service": "AI & Intelligent Automation", "result": "65%", "resultLabel": "faster resolution",
+     "problem": "A high volume of repetitive tickets slowed response times and hurt customer satisfaction.",
+     "solution": "An AI-first support platform with intelligent ticket routing, automated answers to common queries and AI-assisted agent suggestions.",
+     "outcome": "65% reduction in resolution time.", "tech": ["Python", "TensorFlow", "React", "PostgreSQL", "Redis", "AWS"], "art": "net"},
+    {"title": "Multi-Tenant E-Commerce Marketplace", "category": "Retail / E-Commerce", "service": "SaaS Product Development", "result": "100s", "resultLabel": "of vendors supported",
+     "problem": "The client needed a scalable marketplace for hundreds of vendors, with complex inventory, commission and payout logic.",
+     "solution": "Vendor dashboards, automated commission calculations, real-time inventory sync and integrated payments.",
+     "outcome": "A marketplace platform built for hundreds of vendors.", "tech": ["Next.js", "Node.js", "PostgreSQL", "Stripe", "Redis", "Docker"], "art": "grid"},
+    {"title": "Manufacturing IoT Dashboard", "category": "Manufacturing / Industrial", "service": "Custom Software Development", "result": "200+", "resultLabel": "machines monitored",
+     "problem": "No real-time visibility into equipment performance was causing unplanned downtime.",
+     "solution": "An IoT analytics platform ingesting sensor data from 200+ machines, with predictive maintenance alerts, OEE tracking and custom dashboards.",
+     "outcome": "Real-time monitoring of 200+ machines.", "tech": ["React", "TypeScript", "TimescaleDB", "MQTT", "InfluxDB", "Grafana"], "art": "wave"},
+    {"title": "Healthcare Patient Portal", "category": "Healthcare / HealthTech", "service": "Web Development", "result": "HIPAA", "resultLabel": "compliant by design",
+     "problem": "A clinic network needed a secure, HIPAA-compliant portal for appointments, records, telehealth and messaging.",
+     "solution": "Appointment scheduling, secure messaging, telehealth integration, prescription management and audit logging.",
+     "outcome": "A secure, compliant patient experience across the clinic network.", "tech": ["React Native", "Node.js", "PostgreSQL", "Twilio", "AWS"], "art": "orbit"},
+    {"title": "FinTech Lending Platform", "category": "Finance / FinTech", "service": "Custom Software Development", "result": "$50M+", "resultLabel": "in loans originated",
+     "problem": "A startup needed a compliant lending platform with KYC/AML, credit scoring and automated underwriting.",
+     "solution": "Identity verification, ML-based credit scoring, document processing and bank-grade security.",
+     "outcome": "$50M+ in loans originated.", "tech": ["TypeScript", "Node.js", "PostgreSQL", "Plaid", "Stripe", "AWS"], "art": "stack"},
+    {"title": "EdTech Adaptive Learning Platform", "category": "Education / EdTech", "service": "AI & Intelligent Automation", "result": "100K+", "resultLabel": "students personalized",
+     "problem": "An EdTech company needed an AI engine to personalize learning paths for 100K+ students.",
+     "solution": "Knowledge tracing, content recommendations, real-time analytics and a mobile-first responsive design.",
+     "outcome": "Personalized learning paths at scale.", "tech": ["React", "Python", "FastAPI", "PostgreSQL", "Redis", "Kubernetes"], "art": "net"},
+    {"title": "Logistics Route Optimization Engine", "category": "Logistics / Transportation", "service": "AI & Intelligent Automation", "result": "18%", "resultLabel": "fuel savings",
+     "problem": "A regional carrier with 500+ vehicles needed AI-driven route optimization to cut fuel costs and improve on-time delivery.",
+     "solution": "A route engine built on OR-Tools and custom heuristics, integrated with telematics and dispatch systems.",
+     "outcome": "18% fuel savings.", "tech": ["Python", "OR-Tools", "React", "PostgreSQL", "Kafka", "AWS"], "art": "flow"},
+    {"title": "Professional Services Practice Management", "category": "Professional Services", "service": "SaaS Product Development", "result": "5 → 1", "resultLabel": "tools consolidated",
+     "problem": "A consulting firm needed integrated practice management across resource planning, proposals, time tracking and utilization.",
+     "solution": "One platform replacing five tools, with resource allocation, automated proposal generation and utilization dashboards.",
+     "outcome": "Five tools consolidated into one.", "tech": ["Next.js", "Node.js", "PostgreSQL", "Prisma", "Auth0", "Vercel"], "art": "grid"},
+]
+
+CATEGORIES = [["AI & Machine Learning", 12], ["Software Engineering", 18], ["Web Development", 15], ["Mobile Development", 8],
+              ["SaaS & Products", 10], ["Digital Growth", 7], ["Startup Strategy", 9], ["DevOps & Infrastructure", 11]]
+
+POSTS = [
+    ["Building Production-Ready AI Agents: Architecture Patterns That Scale", "AI & Machine Learning", 12, "Observability, error handling and evaluation frameworks for moving AI agents from prototype to production."],
+    ["Migrating to Next.js 14 App Router: A Complete Guide for Large Teams", "Software Engineering", 18, "A step-by-step account of migrating a 200+ page enterprise app, covering streaming, server components and performance."],
+    ["Headless Commerce Architecture: When to Decouple and How to Succeed", "Web Development", 15, "A decision framework for headless commerce, with patterns from large-scale implementations."],
+    ["Flutter vs React Native: A Decision Framework for Product Teams", "Mobile Development", 14, "Both frameworks are production-ready. Here is how to choose based on your team, timeline and requirements."],
+    ["Multi-Tenancy Patterns for B2B SaaS: Row-Level Security vs Schema Isolation", "SaaS & Products", 16, "Comparing database multi-tenancy approaches and their trade-offs, drawn from client work."],
+    ["The Complete Technical SEO Checklist: Core Web Vitals and Beyond", "Digital Growth", 20, "Core Web Vitals, structured data, crawl budget and the INP metric, in one practical checklist."],
+    ["When to Hire a Fractional CTO: A Founder’s Decision Framework", "Startup Strategy", 11, "Signals that you’re ready for fractional technical leadership, what to expect and how to structure it."],
+    ["Kubernetes Cost Optimization: How We Reduced Cloud Spend by 40%", "DevOps & Infrastructure", 13, "Right-sizing, spot instances and autoscaling, with reusable Terraform modules."],
+    ["Evaluating RAG Systems: Beyond Recall@K to Business Metrics", "AI & Machine Learning", 17, "A framework linking retrieval quality to user satisfaction and task completion rates."],
+    ["React Server Components Deep Dive: Mental Models for the New Paradigm", "Software Engineering", 22, "How RSC changes data fetching, interactivity and bundle size, including common pitfalls."],
+]
+
+FAQ = [
+    ["How quickly will you respond?", "Inquiries get a reply within 24 business hours. For urgent matters, please call us."],
+    ["Do you sign NDAs?", "Yes. We can sign a mutual NDA before detailed project discussions. Just mention it in your message."],
+    ["What is your minimum project size?", "Projects typically start at $25K USD. For smaller needs, we can point you to starter packages or trusted partners."],
+    ["Do you work with startups?", "Yes. We help early-stage companies with technical planning, MVP development and architecture, with flexible engagement models."],
+    ["Can you work with our existing team?", "Yes. Through staff augmentation and dedicated team models, our engineers work directly alongside your in-house team."],
+]
+
+NEXT_STEPS = [
+    ["We review", "Our team reviews your inquiry within 4 business hours."],
+    ["We connect", "We email you to schedule a 30-minute discovery call."],
+    ["We explore", "On the call we discuss your goals, challenges and possible approaches."],
+    ["We propose", "You receive a tailored proposal with scope, timeline and investment. No obligation."],
+]
+
+VALUES = [
+    ["Meaningful work", "Build products that real businesses depend on every day."],
+    ["AI at the core", "Work hands-on with modern AI, from agents to machine learning."],
+    ["Room to grow", "Learn across design, engineering and product with a senior team."],
+    ["Real ownership", "Small teams, clear goals and the freedom to do your best work."],
+]
+
+TECH = ["TypeScript", "React", "Next.js", "Node.js", "Python", "FastAPI", "PostgreSQL", "TensorFlow", "PyTorch", "Flutter",
+        "React Native", "AWS", "Docker", "Kubernetes", "Stripe", "Redis", "Three.js"]
+
+CONTACT = {
+    "email": "hello@vastverse.com",
+    "phone": "+1 (555) 123-4567",
+    "hours": "Monday to Friday, 9am to 6pm EST",
+    "address": "123 Innovation Drive, San Francisco, CA 94105, USA",
+    "twitter": "vastversetech",
+}
+
+# Indicative pricing used by the project estimator (USD). The frontend uses the
+# same table for its offline fallback, so both always agree.
+ESTIMATOR = {
+    "minimum": 25000,
+    "services": {"ai": 32000, "custom": 28000, "web": 18000, "mobile": 30000, "saas": 38000, "migration": 24000, "support": 25000},
+    "features": {
+        "accounts": ["User accounts and login", 3000],
+        "payments": ["Payments and subscriptions", 5500],
+        "admin": ["Admin dashboard", 6000],
+        "ai": ["AI features or agents", 12000],
+        "integrations": ["Third-party integrations", 4500],
+        "analytics": ["Analytics and reporting", 3500],
+        "realtime": ["Real-time updates and chat", 5000],
+        "i18n": ["Multiple languages", 3000],
+    },
+    "scale": {"mvp": ["MVP", 0.8], "growth": ["Growth product", 1.0], "enterprise": ["Enterprise", 1.6]},
+    "timeline": {"flexible": ["Flexible", 0.95], "standard": ["Standard", 1.0], "rush": ["Rush", 1.25]},
+}
+
+
+def all_content() -> dict:
+    return {
+        "stats": STATS, "capabilities": CAPABILITIES, "principles": PRINCIPLES, "services": SERVICES,
+        "homeServices": HOME_SERVICES, "solutions": SOLUTIONS, "industries": INDUSTRIES, "process": PROCESS,
+        "projects": PROJECTS, "categories": CATEGORIES, "posts": POSTS, "faq": FAQ, "nextSteps": NEXT_STEPS,
+        "values": VALUES, "tech": TECH, "contact": CONTACT, "estimator": ESTIMATOR,
+    }
