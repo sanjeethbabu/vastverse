@@ -142,6 +142,7 @@
 })();
 </script>
 <div id="universe" aria-hidden="true"></div>
+<canvas id="warp" aria-hidden="true"></canvas>
 <div class="scrim" aria-hidden="true"></div>
 <div class="progress" aria-hidden="true"><i id="prog"></i></div>
 <div class="ptip" id="ptip" aria-hidden="true"></div>
@@ -212,8 +213,41 @@
       <div class="pin col-w">
         <span class="kicker">Welcome to the Vastverse</span>
         <h2 class="big split">Innovation <b>from vision.</b></h2>
+        <div class="name-eq" data-reveal aria-label="Vast, meaning boundless, plus verse, meaning universe, equals Vastverse: one universe of software and AI">
+          <div><b>VAST</b><span>Boundless, big</span></div>
+          <div class="op" aria-hidden="true">+</div>
+          <div><b>VERSE</b><span>A universe</span></div>
+          <div class="op" aria-hidden="true">=</div>
+          <div class="eq-res"><b>VASTVERSE</b><span>One universe of software &amp; AI, for your business</span></div>
+        </div>
         <p class="lede" data-reveal>We are a technology and digital innovation company. We build custom software, web and mobile apps, SaaS platforms and next-generation AI that help startups, entrepreneurs and established businesses turn ideas into future-ready technology.</p>
         <div class="stats" id="stats" data-reveal></div>
+      </div>
+    </section>
+    <section class="panel" data-name="AI consultant" data-shape="neural" data-side="0">
+      <div class="pin">
+        <span class="kicker"><i class="live-dot"></i>Live AI consultant</span>
+        <h2 class="h2 split">Ask our AI where <b>it can help you.</b></h2>
+        <div class="chat" id="chat" data-reveal>
+          <div class="chat-head">
+            <div class="chat-av" aria-hidden="true"><i></i></div>
+            <div><b>Vastverse AI</b><span id="chatStatus">Online, usually replies in seconds</span></div>
+          </div>
+          <div class="chat-log" id="chatLog" role="log" aria-live="polite">
+            <div class="msg bot"><p>Hi! Tell me a little about your business and I'll show you where AI agents and automation could save you time and money.</p></div>
+          </div>
+          <div class="chat-chips" id="chatChips">
+            <button type="button">I run a retail store and track stock in Excel</button>
+            <button type="button">Automate our customer support</button>
+            <button type="button">Build an AI agent for my sales team</button>
+            <button type="button">We're a clinic drowning in paperwork</button>
+          </div>
+          <form class="chat-form" id="chatForm" autocomplete="off">
+            <label class="sr" for="chatIn">Message the AI consultant</label>
+            <textarea id="chatIn" rows="1" maxlength="1500" placeholder="Describe your business..." required></textarea>
+            <button class="chat-send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </form>
+        </div>
       </div>
     </section>
     <section class="panel al-right" data-name="Why Vastverse" data-shape="galaxy" data-side="-1">

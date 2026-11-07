@@ -14,11 +14,26 @@ import time
 from collections import defaultdict, deque
 from pathlib import Path
 
+
+def _load_dotenv() -> None:
+    """Local dev convenience: read KEY=VALUE lines from the repo-root .env (real env vars win)."""
+    f = Path(__file__).resolve().parents[2] / ".env"
+    if not f.exists():
+        return
+    for line in f.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+
+
+_load_dotenv()
+
 from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
-from . import mailer, storage
+from . import consultant, mailer, storage
 from .content import CONTACT, SERVICES, all_content
 from .estimator import estimate
 
@@ -91,10 +106,26 @@ class EstimateIn(BaseModel):
     timeline: str = "standard"
 
 
+class ChatMsg(BaseModel):
+    role: str = Field(pattern="^(user|assistant)$")
+    content: str = Field(min_length=1, max_length=2000)
+
+
+class ChatIn(BaseModel):
+    messages: list[ChatMsg] = Field(min_length=1, max_length=30)
+
+    @field_validator("messages")
+    @classmethod
+    def _last_is_user(cls, v: list[ChatMsg]) -> list[ChatMsg]:
+        if v[-1].role != "user":
+            raise ValueError("The last message must come from you")
+        return v
+
+
 # --- routes ------------------------------------------------------------------------
 @app.get("/api/health")
 def health():
-    return {"ok": True, "email": mailer.configured(), "storage": "supabase" if storage.enabled() else "off"}
+    return {"ok": True, "email": mailer.configured(), "storage": "supabase" if storage.enabled() else "off", "ai": consultant.configured()}
 
 
 @app.get("/api/content")
@@ -153,6 +184,17 @@ def post_contact(body: ContactIn, request: Request):
             except Exception:
                 log.exception("Auto-reply failed")
     return {"ok": True, "message": ok_msg}
+
+
+@app.post("/api/chat")
+def post_chat(body: ChatIn, request: Request):
+    rate_limit(request, limit=15)
+    if not consultant.configured():
+        raise HTTPException(503, f"Our AI consultant is offline right now. {FALLBACK}")
+    try:
+        return {"reply": consultant.reply([m.model_dump() for m in body.messages])}
+    except consultant.ConsultantError:
+        raise HTTPException(502, f"Our AI consultant couldn't answer just now. Please try again, or {FALLBACK[0].lower() + FALLBACK[1:]}")
 
 
 @app.post("/api/newsletter", status_code=201)

@@ -2,7 +2,9 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import FALLBACK from './content.json';
 import { api } from './api.js';
-import { createVerse, PLANET_ORDER } from './verse.js';
+import { createVerse, PLANET_ORDER, SHAPES } from './verse.js';
+import { createWarp } from './warp.js';
+import { initChat } from './chat.js';
 import { createFilm } from './film.js';
 import { $, $$, esc, initCursor, initTilt, splitHeadings, openModal, initModal, initArt } from './ui.js';
 
@@ -142,6 +144,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
 /* ============================================================ universe + film */
 const universe = createVerse($('#universe'), { reduce: REDUCE });
 const film = createFilm({ reduce: REDUCE, gsap, $ });
+const warp = createWarp($('#warp'), { reduce: REDUCE });
 film.loadAll();
 
 /* ============================================================ journey: horizontal (desktop) or vertical (mobile) */
@@ -155,6 +158,14 @@ function buildJourney(page, r) {
     p.classList.toggle('zz-r', z % 2 === 1);
     p.dataset.side = z % 2 === 1 ? -1 : 1;
     p.dataset.shape = PLANET_ORDER[(routeIdx * 3 + z) % PLANET_ORDER.length];
+    // every section is a world: a coordinate tag names the planet beside it (nebula + flying stars live in verse.js)
+    const shape = SHAPES[p.dataset.shape], total = panels.filter(x => !x.hasAttribute('data-footer')).length;
+    const k = p.querySelector('.kicker');
+    if (k && shape && !k.closest('.film')) {
+      let tag = p.querySelector('.world-tag');
+      if (!tag) { tag = document.createElement('div'); tag.className = 'world-tag'; tag.setAttribute('aria-hidden', 'true'); k.before(tag); }
+      tag.innerHTML = `<i></i>World <b>${String(z + 1).padStart(2, '0')}</b> / ${String(total).padStart(2, '0')} &middot; ${esc(shape.label)}`;
+    }
     z++;
   });
   J.st = ScrollTrigger.create({ trigger: wrap, start: 'top bottom', end: 'bottom top', onUpdate: () => active() });
@@ -182,18 +193,33 @@ function buildJourney(page, r) {
   return J;
 }
 
+/* zigzag entrance: content in a left panel slides in from the left, right panel from the right */
+const sideOf = el => { const p = el.closest('.panel'); return p && p.classList.contains('zz-r') ? 1 : -1; };
+const SLIDE = () => Math.min(120, innerWidth * .08);
+
 function animatePage(page, J) {
   const first = $('.panel', page);
+  // background zoom: as a section scrolls through, its backdrop zooms in toward the content and fades in/out
+  $$('.world-tag', page).forEach(t => {
+    const now = first.contains(t) && page.dataset.page !== 'home';
+    gsap.from(t, { opacity: 0, letterSpacing: '.5em', duration: 1.1, ease: 'power3.out', delay: now ? .2 : 0, scrollTrigger: now ? undefined : trig(t, J), clearProps: 'opacity,letterSpacing' });
+  });
   $$('.split', page).forEach(h => {
     const inFirst = first.contains(h) && !h.closest('.film');
     const words = $$('.w > span', h);
     if (h.closest('.h-intro')) { gsap.from(words, { yPercent: 110, rotate: 4, duration: 1, ease: 'power4.out', stagger: .05, delay: .3 }); return; }
-    gsap.from(words, { yPercent: 110, rotate: 4, duration: 1, ease: 'power4.out', stagger: .05, delay: inFirst && page.dataset.page !== 'home' ? .35 : 0,
-      scrollTrigger: inFirst && page.dataset.page !== 'home' ? undefined : trig(h, J) });
+    const now = inFirst && page.dataset.page !== 'home', delay = now ? .35 : 0, scrollTrigger = now ? undefined : trig(h, J);
+    gsap.from(words, { yPercent: 108, rotate: 3, scale: 1.04, opacity: 0, duration: .9, ease: 'expo.out', stagger: .06, delay, scrollTrigger });
+    if (!h.closest('.film')) gsap.from(h, { x: sideOf(h) * SLIDE(), duration: 1.1, ease: 'power3.out', delay, scrollTrigger, clearProps: 'transform' });
+  });
+  $$('.kicker', page).forEach(k => {
+    if (k.closest('.film, .h-intro, [data-reveal]')) return;
+    const now = first.contains(k) && page.dataset.page !== 'home';
+    gsap.from(k, { x: sideOf(k) * SLIDE() * .6, opacity: 0, duration: .9, ease: 'power3.out', delay: now ? .3 : 0, scrollTrigger: now ? undefined : trig(k, J), clearProps: 'transform,opacity' });
   });
   $$('[data-reveal]', page).forEach((el, i) => {
     const inFirst = first.contains(el) && page.dataset.page !== 'home';
-    gsap.from(el, { y: 50, opacity: 0, rotateX: -10, scale: .97, transformPerspective: 900, duration: .9, ease: 'power3.out', force3D: true,
+    gsap.from(el, { x: sideOf(el) * SLIDE(), y: 20, opacity: 0, rotateY: sideOf(el) * -8, scale: .97, transformPerspective: 900, duration: 1, ease: 'power3.out', force3D: true,
       delay: inFirst ? .4 + (i % 4) * .07 : (i % 4) * .06, scrollTrigger: inFirst ? undefined : trig(el, J),
       ...revealHooks(el) });
   });
@@ -246,7 +272,8 @@ function go(r, after) {
   if (route === null || REDUCE) { render(r); after && after(); return; }
   $('#app').classList.add('leaving');
   if (universe) { universe.setVisible(1); universe.burst(); }
-  setTimeout(() => { render(r); $('#app').classList.remove('leaving'); after && after(); }, 450);
+  warp.jump(1100);   // hyperspace jump to the next world
+  setTimeout(() => { render(r); $('#app').classList.remove('leaving'); after && after(); }, 520);
 }
 function applyPending() {
   if (route === 'services' && pendingSvc !== null) { showSvc(pendingSvc); pendingSvc = null; }
@@ -273,7 +300,7 @@ addEventListener('popstate', () => { const h = location.hash.slice(1); if (ROUTE
 let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => journey && journey.measure(), 250); });
 
 /* ============================================================ boot */
-initCursor(); initTilt(REDUCE); initModal();
+initCursor(); initTilt(REDUCE); initModal(); initChat();
 (async () => {
   try { const live = await api('/api/content', { timeout: 1500 }); if (live && live.services) C = live; } catch { /* static preview: bundled content */ }
   renderContent();

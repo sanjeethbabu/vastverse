@@ -84,7 +84,10 @@ export function initArt(root, reduce) {
 function drawArt(o, t) {
   const { cv, ctx, kind, pts } = o, dpr = Math.min(devicePixelRatio, 2), w = cv.clientWidth, h = cv.clientHeight;
   if (!w) return; if (cv.width !== Math.round(w * dpr)) { cv.width = w * dpr; cv.height = h * dpr; }
-  o.hov += (o.hovT - o.hov) * .08; const sp = 1 + o.hov * 2.5, T = t * .0004 * sp;
+  // Advance phase by frame delta (not absolute time) so hover never makes the art jump.
+  const dt = o.last ? Math.min(t - o.last, 50) : 0; o.last = t;
+  o.T = (o.T ?? 1.6) + dt * .0004;
+  o.hov += (o.hovT - o.hov) * .06; const sp = 1, T = o.T;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, h);
   const g = ctx.createRadialGradient(w * .7, h * .3, 0, w * .7, h * .3, w * .8); g.addColorStop(0, `rgba(91,168,255,${.18 + o.hov * .15})`); g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, w, h); ctx.lineWidth = 1;

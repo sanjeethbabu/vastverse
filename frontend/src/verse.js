@@ -108,10 +108,36 @@ export function createVerse(host, { reduce = false } = {}) {
   const mat = new THREE.ShaderMaterial({ uniforms: U, vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending });
   const grp = new THREE.Group(), points = new THREE.Points(geo, mat); points.frustumCulled = false; grp.add(points); scene.add(grp);
 
-  /* background stars for depth */
-  { const n = small ? 1200 : 2600, p = new Float32Array(n * 3); for (let i = 0; i < n; i++) p.set([(rnd() - .5) * 140, (rnd() - .5) * 90, -30 - rnd() * 60], i * 3);
-    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3));
-    const stars = new THREE.Points(g, new THREE.PointsMaterial({ color: 0xBFD8FF, size: .12, transparent: true, opacity: .55, depthWrite: false })); scene.add(stars); var starField = stars; }
+  /* background stars: they fly toward the camera as you scroll (wrapped in the shader, so it never runs out) */
+  const SU = { uFly: { value: 0 }, uPix: U.uPix, uOpacity: { value: .9 } };
+  { const n = small ? 1400 : 3200, p = new Float32Array(n * 3), r = new Float32Array(n);
+    for (let i = 0; i < n; i++) { p.set([(rnd() - .5) * 120, (rnd() - .5) * 76, -90 + rnd() * 98], i * 3); r[i] = rnd(); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(p, 3)); g.setAttribute('aRnd', new THREE.BufferAttribute(r, 1));
+    const sm = new THREE.ShaderMaterial({ uniforms: SU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+      vertexShader: `uniform float uFly,uPix; attribute float aRnd; varying float vA; varying vec3 vC;
+        void main(){ vec3 p = position; p.z = -90. + mod(p.z + 90. + uFly, 98.);
+          vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv;
+          float near = smoothstep(8., 2., p.z), far = smoothstep(-90., -70., p.z);
+          vA = far * near * (.45 + .55 * aRnd);
+          gl_PointSize = clamp((1.2 + aRnd * 2.2) * 26. * uPix / -mv.z, .8, 7. * uPix);
+          vC = aRnd > .82 ? vec3(.62,.82,1.) : vec3(.9,.95,1.); }`,
+      fragmentShader: `uniform float uOpacity; varying float vA; varying vec3 vC;
+        void main(){ float d = length(gl_PointCoord - .5); float a = smoothstep(.5, .0, d); if (a < .02) discard; gl_FragColor = vec4(vC, a * vA * uOpacity); }` });
+    const stars = new THREE.Points(g, sm); stars.frustumCulled = false; stars.renderOrder = -2; scene.add(stars); var starField = stars; }
+
+  /* nebula behind each world, tinted with its planet colours; zooms in with the section and fades during transitions */
+  const NU = { uTime: U.uTime, uB: U.uB, uC: U.uC, uAlpha: { value: 0 }, uZoom: { value: 1 } };
+  const neb = new THREE.Mesh(new THREE.PlaneGeometry(90, 56), new THREE.ShaderMaterial({ uniforms: NU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+    vertexShader: `varying vec2 vP; void main(){ vP = position.xy; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
+    fragmentShader: `uniform float uTime,uAlpha,uZoom; uniform vec3 uB,uC; varying vec2 vP;
+      float blob(vec2 p, vec2 c, float r){ vec2 d = (p - c) / r; return exp(-dot(d, d)); }
+      void main(){ vec2 p = vP / uZoom; float t = uTime * .05;
+        float a = blob(p, vec2(sin(t) * 2.5, cos(t * .8) * 1.5), 11.) * .55
+                + blob(p, vec2(6. + cos(t * 1.3) * 3., -3. + sin(t) * 2.), 7.) * .35
+                + blob(p, vec2(-7. + sin(t * .9) * 2., 4. + cos(t * 1.1) * 2.), 8.) * .25;
+        vec3 col = mix(uC, uB, blob(p, vec2(0.), 6.) * .6);
+        gl_FragColor = vec4(col * a, 1.) * uAlpha; }` }));
+  neb.position.z = -26; neb.renderOrder = -1; neb.frustumCulled = false; scene.add(neb);
 
   /* constellation lines from the cursor */
   const MAXL = small ? 22 : 44, lp = new Float32Array(MAXL * 6), lc = new Float32Array(MAXL * 6), lg = new THREE.BufferGeometry();
@@ -194,7 +220,13 @@ export function createVerse(host, { reduce = false } = {}) {
       grp.rotation.x += (((cfg ? cfg.rx : 0) + m.ny * .2) - grp.rotation.x) * .05;
       grp.rotation.z += (m.nx * -.06 - grp.rotation.z) * .05;
       camera.position.x += (m.nx * .5 - camera.position.x) * .03; camera.position.y += (-m.ny * .35 - camera.position.y) * .03; camera.lookAt(0, 0, 0);
-      starField.rotation.z = sNow * .08; starField.position.y = sNow * 1.5;
+      starField.rotation.z = sNow * .08;
+      SU.uFly.value = sNow * 16 + (reduce ? 0 : T * .35);            // each section flies you ~16 units deeper
+      SU.uOpacity.value = vis * .95;
+      // nebula sits behind the planet, zooms with section progress, hides while the planet explodes/reforms
+      neb.position.x = grp.position.x * 2.2; neb.position.y = grp.position.y;
+      NU.uZoom.value = .85 + .55 * smooth(0, 1, t);
+      NU.uAlpha.value += ((cfg ? (1 - Math.max(eIn, eOut)) * .5 : .12) * vis - NU.uAlpha.value) * .08;
       grp.updateMatrixWorld();
 
       // cursor: repel + constellation lines

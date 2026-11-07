@@ -92,3 +92,38 @@ def test_supabase_used_when_configured(client, monkeypatch):
 def test_rate_limit(client, sent):
     codes = [client.post("/api/newsletter", json={"email": f"u{i}@b.co"}).status_code for i in range(8)]
     assert codes[:6] == [201] * 6 and codes[-1] == 429
+
+
+# --- AI consultant chat ------------------------------------------------------------
+from app import consultant  # noqa: E402
+
+CHAT = {"messages": [{"role": "user", "content": "I run a bakery with 5 staff."}]}
+
+
+def test_chat_offline_without_key(client, monkeypatch):
+    monkeypatch.delenv("XAI_API_KEY", raising=False)
+    r = client.post("/api/chat", json=CHAT)
+    assert r.status_code == 503
+
+
+def test_chat_replies(client, monkeypatch):
+    monkeypatch.setenv("XAI_API_KEY", "test")
+    seen = {}
+    monkeypatch.setattr(consultant, "reply", lambda msgs: seen.setdefault("m", msgs) and "Try **AI ordering**.")
+    r = client.post("/api/chat", json=CHAT)
+    assert r.status_code == 200 and r.json()["reply"] == "Try **AI ordering**."
+    assert seen["m"] == CHAT["messages"]
+
+
+def test_chat_rejects_bad_payload(client, monkeypatch):
+    monkeypatch.setenv("XAI_API_KEY", "test")
+    assert client.post("/api/chat", json={"messages": [{"role": "system", "content": "hi"}]}).status_code == 422
+    assert client.post("/api/chat", json={"messages": [{"role": "assistant", "content": "hi"}]}).status_code == 422
+
+
+def test_chat_upstream_failure(client, monkeypatch):
+    monkeypatch.setenv("XAI_API_KEY", "test")
+    def boom(_):
+        raise consultant.ConsultantError("down")
+    monkeypatch.setattr(consultant, "reply", boom)
+    assert client.post("/api/chat", json=CHAT).status_code == 502
