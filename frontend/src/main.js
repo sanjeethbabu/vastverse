@@ -104,7 +104,11 @@ document.addEventListener('click', e => {
     $$('.fchip', group).forEach(b => b.setAttribute('aria-pressed', b === fc));
     const show = items.filter(it => fc.dataset.f === 'All' || it.dataset.key === fc.dataset.f);
     items.forEach(it => it.classList.toggle('hidden', !show.includes(it)));
-    if (!REDUCE) gsap.fromTo(show, { y: 40, opacity: 0, rotateX: -8 }, { y: 0, opacity: 1, rotateX: 0, duration: .6, stagger: .05, ease: 'power3.out' });
+    if (!REDUCE) {
+      show.forEach(el => el.classList.add('revealing'));
+      gsap.fromTo(show, { y: 40, opacity: 0, rotateX: -8 }, { y: 0, opacity: 1, rotateX: 0, duration: .6, stagger: .05, ease: 'power3.out', force3D: true,
+        onComplete: () => { show.forEach(el => el.classList.remove('revealing')); gsap.set(show, { clearProps: 'transform,opacity' }); } });
+    }
     if (group.id === 'ifilters' && fc.dataset.f !== 'All' && HMODE) setTimeout(() => journey.jumpTo(journey.panels.findIndex(p => p.dataset.name === 'Articles')), 250);
     setTimeout(() => ScrollTrigger.refresh(), 50); return;
   }
@@ -189,8 +193,9 @@ function animatePage(page, J) {
   });
   $$('[data-reveal]', page).forEach((el, i) => {
     const inFirst = first.contains(el) && page.dataset.page !== 'home';
-    gsap.from(el, { y: 60, opacity: 0, rotateX: -12, scale: .96, transformPerspective: 900, duration: 1, ease: 'power3.out',
-      delay: inFirst ? .5 + (i % 4) * .08 : (i % 4) * .06, scrollTrigger: inFirst ? undefined : trig(el, J) });
+    gsap.from(el, { y: 50, opacity: 0, rotateX: -10, scale: .97, transformPerspective: 900, duration: .9, ease: 'power3.out', force3D: true,
+      delay: inFirst ? .4 + (i % 4) * .07 : (i % 4) * .06, scrollTrigger: inFirst ? undefined : trig(el, J),
+      ...revealHooks(el) });
   });
   $$('[data-count]', page).forEach(c => {
     const o = { v: 0 }, to = +c.dataset.count, dec = +c.dataset.dec || 0;
@@ -198,6 +203,15 @@ function animatePage(page, J) {
   });
 }
 const trig = el => ({ trigger: el, start: 'top 88%' });
+/* while GSAP drives a card's transform, switch off its CSS transform transition (the tilt hover one),
+   otherwise every GSAP frame gets re-eased by CSS and the reveal looks laggy; hand transform back when done */
+function revealHooks(el) {
+  return {
+    onStart: () => el.classList.add('revealing'),
+    onComplete: () => { el.classList.remove('revealing'); gsap.set(el, { clearProps: 'transform,opacity' }); },
+    onReverseComplete: () => el.classList.remove('revealing'),
+  };
+}
 
 function setupPage(r) {
   if (ctx) ctx.revert();
@@ -208,7 +222,12 @@ function setupPage(r) {
     if (r === 'home') {
       universe && universe.setVisible(REDUCE ? 1 : 0);
       $('#jmap').classList.add('hide');
-      film.timeline(ScrollTrigger, { onDone: done => { universe && universe.setVisible(done ? 1 : 0); $('#jmap').classList.toggle('hide', !done); } });
+      let wasDone = false;
+      film.timeline(ScrollTrigger, { onDone: done => {
+        if (done && !wasDone && universe) universe.burst();   // particles burst out of the flash into the universe
+        wasDone = done;
+        universe && universe.setVisible(done ? 1 : 0); $('#jmap').classList.toggle('hide', !done);
+      } });
     } else { universe && universe.setVisible(1); $('#jmap').classList.remove('hide'); }
     journey = buildJourney(page, r);
     if (REDUCE) $$('[data-count]', page).forEach(c => c.textContent = c.dataset.count + (c.dataset.suf || ''));

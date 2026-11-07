@@ -156,7 +156,7 @@ html.hmode .al-bottom{justify-content:flex-end}
 @keyframes nudge{50%{transform:translateX(10px)}}
 
 /* ---------- film hero ---------- */
-.film{position:relative;height:100vh;height:100svh;overflow:hidden;background:#000}
+.film{position:relative;height:100vh;height:100svh;overflow:hidden;background:transparent}
 .film canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #syn{mix-blend-mode:screen}
 .film .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(0,0,0,.55) 0%,transparent 50%),linear-gradient(180deg,rgba(0,0,0,.25) 0%,transparent 30%,transparent 48%,rgba(0,0,0,.85) 100%);pointer-events:none}
@@ -188,8 +188,11 @@ html.hmode .al-bottom{justify-content:flex-end}
 .loader i::after{content:"";position:absolute;inset:0;background:var(--spark);transform-origin:0 50%;transform:scaleX(var(--p,0))}
 
 /* ---------- shared blocks ---------- */
-.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:26px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-.tilt{transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);will-change:transform;position:relative}
+/* no backdrop-filter on cards: re-blurring the live WebGL universe behind every card each frame was the main
+   cause of scroll/reveal lag. A slightly denser fill keeps the same frosted look. */
+.card{background:linear-gradient(180deg,rgba(18,23,35,.86),rgba(11,14,22,.82));border:1px solid var(--line);border-radius:20px;padding:26px}
+.tilt{transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);will-change:transform;position:relative;backface-visibility:hidden}
+.tilt.revealing{transition:none}
 .tilt::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(380px circle at var(--mx,50%) var(--my,50%),rgba(159,208,255,.14),transparent 45%);opacity:0;transition:opacity .3s}
 .tilt:hover::after{opacity:1}
 .split .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em;margin-bottom:-.08em}
@@ -390,6 +393,7 @@ textarea{min-height:clamp(90px,14vh,140px);resize:vertical}
   .strip{grid-template-columns:1fr}
   .fcols{grid-template-columns:1fr 1fr}
   .h-left{top:16vh}.h-right{bottom:30vh}
+  .h-side{text-shadow:0 2px 18px rgba(0,0,0,.85)}
   .grid3{grid-template-columns:1fr}.sheet{padding:28px}
   .jmap{display:none}
 }
@@ -404,6 +408,12 @@ textarea{min-height:clamp(90px,14vh,140px);resize:vertical}
   .h-intro{bottom:5vh}.h-intro h1{font-size:2.05rem;margin-bottom:14px}.h-intro p{font-size:.98rem;margin-bottom:18px}
   .h-actions .btn{padding:12px 18px;font-size:.92rem}.h-intro .tags,.cue{display:none}
   .jmap{bottom:14px;padding:8px 12px}
+}
+/* portrait hero (matches film.js portrait mode): headings above / below the hands, never on them */
+@media (max-aspect-ratio:21/20){
+  .h-left{top:calc(78px + 2vh);right:max(24px,4vw);max-width:none}
+  .h-right{bottom:7vh;left:max(24px,4vw);max-width:none}
+  .h-meet{bottom:9vh}
 }
 .rm .marquee .row,.rm .cue i,.rm .orb,.rm .jmap .hint i::after{animation:none}
 

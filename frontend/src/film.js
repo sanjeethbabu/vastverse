@@ -3,7 +3,7 @@ const FRAMES = 95;
 const INT = [0,0,.01,.01,.02,.02,.03,.03,.03,.04,.04,.05,.05,.07,.11,.15,.21,.25,.3,.34,.37,.38,.39,.39,.39,.39,.39,.39,.4,.4,.41,.42,.43,.43,.43,.44,.45,.47,.48,.49,.5,.51,.53,.54,.56,.57,.59,.61,.63,.65,.66,.68,.7,.72,.73,.74,.76,.78,.81,.83,.85,.86,.88,.9,.92,.94,.95,.96,.98,.98,.98,.99,.99,.99,1,1,1,1,1,1,1,.99,.96,.95,.92,.9,.87,.85,.82,.8,.77,.75,.72,.7,.66];
 
 export function createFilm({ reduce, gsap, $ }) {
-  const host = $('#film'), cv = $('#filmCv'), ctx = cv.getContext('2d'), sc = $('#syn'), sx = sc.getContext('2d');
+  const host = $('#film'), cv = $('#filmCv'), ctx = cv.getContext('2d'), sc = $('#syn'), sx = sc.getContext('2d'), shade = host.querySelector('.shade');
   const imgs = new Array(FRAMES); let loaded = 0, ready = false;
   const st = { f: reduce ? 40 : 0, zoom: 1, alpha: 1, active: true };
   const m = { x: -9999, y: -9999, in: false, px: 0, py: 0 };
@@ -23,8 +23,10 @@ export function createFilm({ reduce, gsap, $ }) {
   function size() { dpr = Math.min(devicePixelRatio, 2); W = cv.clientWidth; H = cv.clientHeight; [cv, sc].forEach(c => { c.width = W * dpr; c.height = H * dpr; }); draw(); }
   function layout() {
     const portrait = W / H < 1.05, iw = 1280, ih = 720, fi = st.f / (FRAMES - 1), cxN = .482 + .02 * fi, cyN = .47;
-    let s = portrait ? (W * 2.15) / iw : Math.max(W / iw, H / ih) * 1.06; s *= st.zoom;
-    const fx = W * .5, fy = portrait ? H * .29 : H * .5, par = reduce ? 0 : 1;
+    let s = portrait ? (W * 2.35) / iw : Math.max(W / iw, H / ih) * 1.06; s *= st.zoom;
+    // portrait: hands sit high while the intro copy fills the bottom, then glide to the centre once it fades
+    const pf = Math.min(1, st.f / 14), glide = pf * pf * (3 - 2 * pf);
+    const fx = W * .5, fy = portrait ? H * (.3 + .17 * glide) : H * .5, par = reduce ? 0 : 1;
     const ox = fx - cxN * iw * s - m.px * 14 * par, oy = fy - cyN * ih * s - m.py * 10 * par;
     contact = { x: ox + cxN * iw * s, y: oy + cyN * ih * s };
     return { s, ox, oy, portrait, iw, ih };
@@ -32,12 +34,19 @@ export function createFilm({ reduce, gsap, $ }) {
   function draw() {
     if (!W) return;
     const L = layout(), im = nearest(Math.round(st.f)); scaleNow = L.s;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.globalAlpha = 1; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    if (im) {
+    // the black backdrop fades with the film, so once the flash clears the universe behind shows through (no blackout)
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+    ctx.globalAlpha = st.alpha; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    shade.style.opacity = st.alpha;
+    if (im && st.alpha > .01) {
       ctx.globalAlpha = st.alpha; ctx.drawImage(im, L.ox, L.oy, L.iw * L.s, L.ih * L.s);
-      if (L.portrait) { const top = L.oy, bot = L.oy + L.ih * L.s, g1 = ctx.createLinearGradient(0, top, 0, top + 80), g2 = ctx.createLinearGradient(0, bot - 120, 0, bot);
-        g1.addColorStop(0, '#000'); g1.addColorStop(1, 'rgba(0,0,0,0)'); g2.addColorStop(0, 'rgba(0,0,0,0)'); g2.addColorStop(1, '#000');
-        ctx.globalAlpha = 1; ctx.fillStyle = g1; ctx.fillRect(0, top, W, 80); ctx.fillStyle = g2; ctx.fillRect(0, bot - 120, W, 120); }
+      if (L.portrait) {   // feather the frame's top/bottom edges into black so there is no visible seam
+        const top = L.oy, bot = L.oy + L.ih * L.s, fe = Math.min(170, (bot - top) * .3);
+        const g1 = ctx.createLinearGradient(0, top, 0, top + fe), g2 = ctx.createLinearGradient(0, bot - fe, 0, bot);
+        g1.addColorStop(0, '#000'); g1.addColorStop(.4, 'rgba(0,0,0,.6)'); g1.addColorStop(1, 'rgba(0,0,0,0)');
+        g2.addColorStop(0, 'rgba(0,0,0,0)'); g2.addColorStop(.6, 'rgba(0,0,0,.6)'); g2.addColorStop(1, '#000');
+        ctx.globalAlpha = st.alpha; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, Math.max(0, top)); ctx.fillRect(0, bot, W, H - bot);
+        ctx.fillStyle = g1; ctx.fillRect(0, top, W, fe); ctx.fillStyle = g2; ctx.fillRect(0, bot - fe, W, fe); }
     }
     const I = INT[Math.round(st.f)] || 0, near = m.in ? Math.max(0, 1 - Math.hypot(m.x - contact.x, m.y - contact.y) / 300) : 0;
     $('#glow').style.transform = `translate(${contact.x}px,${contact.y}px) scale(${.4 + I * .9 + near * .3})`;
@@ -144,7 +153,7 @@ export function createFilm({ reduce, gsap, $ }) {
     if (reduce) { size(); return null; }
     gsap.set(['#hLeft', '#hRight', '#hMeet'], { opacity: 0 }); gsap.set('#flash', { opacity: 0 }); gsap.set('#hIntro', { opacity: 1, y: 0 });
     const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: host, start: 'top top', end: '+=360%', pin: true, scrub: .6,
-      onUpdate: s => onDone(s.progress > .9) } });
+      onUpdate: s => onDone(s.progress > .85) } });   // universe starts fading in under the flash peak
     tl.to(st, { f: 15, duration: .3 }, 0).to(st, { f: 94, duration: .55 }, .3)
       .to('#hIntro', { opacity: 0, y: -60, duration: .12 }, .03).to('#cue', { opacity: 0, duration: .05 }, 0)
       .fromTo('#hLeft', { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .07 }, .12)
