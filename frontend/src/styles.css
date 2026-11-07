@@ -5,6 +5,7 @@
   --h2:clamp(1.8rem, min(3.8vw, 6.2vh), 3.3rem);
 }
 *{box-sizing:border-box;margin:0;padding:0}
+*{-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;scrollbar-width:none;-ms-overflow-style:none}
 html::-webkit-scrollbar{display:none}
 body{font-family:var(--body);font-size:1.0625rem;line-height:1.6;color:var(--light);background:var(--void);-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -61,8 +62,6 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:500;letter-spacing:-.025em;li
 .cursor.hover .tip{r:5}
 .cursor.press .hand{transform:scale(.78) translateY(3px)}
 .cursor.away .hand{opacity:0}
-.tap{position:fixed;left:0;top:0;width:10px;height:10px;margin:-5px 0 0 -5px;border-radius:50%;border:1.5px solid rgba(159,208,255,.9);pointer-events:none;z-index:89;animation:tap .6s ease-out forwards}
-@keyframes tap{to{transform:scale(7);opacity:0}}
 @media (pointer:fine){
   .cursor{display:block}
   html.hand-cursor,html.hand-cursor *{cursor:none!important}
@@ -252,7 +251,8 @@ html.hmode .al-bottom{justify-content:flex-end}
 
 /* services explorer */
 .explorer{display:grid;grid-template-columns:minmax(240px,.7fr) 1.6fr;gap:22px;width:100%}
-.tablist{display:flex;flex-direction:column;gap:4px}
+.tablist{display:flex;flex-direction:column;gap:4px;scrollbar-width:none;-ms-overflow-style:none}
+.tablist::-webkit-scrollbar{display:none}
 .tabb{text-align:left;padding:14px 16px;border-radius:14px;border:1px solid transparent;background:rgba(0,0,0,.35);cursor:pointer;display:flex;gap:12px;align-items:baseline;color:var(--steel);transition:all .3s}
 .tabb .n{font-family:var(--display);font-size:.76rem}
 .tabb b{font-weight:600;font-size:.95rem}

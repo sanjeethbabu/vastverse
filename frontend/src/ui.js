@@ -14,9 +14,7 @@ export function initCursor() {
     cur.classList.toggle('hover', !!target?.closest('a,button,.tilt,select,label,.film'));
   });
   addEventListener('pointerdown', e => {
-    if (e.pointerType !== 'mouse') return; cur.classList.add('press');
-    const t = document.createElement('i'); t.className = 'tap'; t.style.left = e.clientX + 'px'; t.style.top = e.clientY + 'px';
-    document.body.appendChild(t); setTimeout(() => t.remove(), 650);
+    if (e.pointerType === 'mouse') cur.classList.add('press');
   });
   addEventListener('pointerup', () => cur.classList.remove('press'));
   (function loop() {

@@ -162,7 +162,8 @@ export function createFilm({ reduce, gsap, $ }) {
       .fromTo('#hMeet', { opacity: 0, scale: .92 }, { opacity: 1, scale: 1, duration: .08 }, .47)
       .to('#hMeet', { opacity: 0, scale: 1.08, duration: .06 }, .72)
       .to(st, { zoom: 2.6, duration: .17 }, .8).to('#flash', { opacity: 1, duration: .09 }, .84)
-      .to(st, { alpha: 0, duration: .01 }, .93).to('#flash', { opacity: 0, duration: .07 }, .93);
+      .to(st, { alpha: 0, duration: .01 }, .93).to('#flash', { opacity: 0, duration: .07 }, .93)
+      .to(st, { alpha: 0, duration: .08 }, 1);
     size();
     return tl;
   }
