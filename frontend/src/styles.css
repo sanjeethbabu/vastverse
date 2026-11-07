@@ -5,7 +5,8 @@
   --h2:clamp(1.8rem, min(3.8vw, 6.2vh), 3.3rem);
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scrollbar-width:none;-ms-overflow-style:none}
+html::-webkit-scrollbar{display:none}
 body{font-family:var(--body);font-size:1.0625rem;line-height:1.6;color:var(--light);background:var(--void);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 ::selection{background:var(--spark);color:#000}
 a{color:inherit} button{font:inherit;color:inherit} img{display:block;max-width:100%}
