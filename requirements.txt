@@ -1,3 +1,4 @@
 # Runtime dependencies for the Vercel Python function (api/index.py)
 fastapi==0.115.6
 pydantic==2.10.4
+langgraph>=0.2,<2

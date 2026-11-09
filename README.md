@@ -4,6 +4,7 @@ Vastverse — Innovation from Vision. A 3D, scroll-driven company website that r
 
 - **Frontend:** Vite, JavaScript modules, Three.js particle planets and GSAP scroll animation. Vercel serves it as a static site.
 - **Backend:** Python FastAPI, running as a single Vercel Python function at `/api/*`.
+- **AI assistant:** Mr. Smart uses a LangGraph workflow in `backend/mr_smart/` with the existing server-side xAI chat integration.
 - **Enquiries:** the contact form and newsletter email you over SMTP. There's no database.
 - **Supabase (optional):** the code is included but off until you add two environment variables.
 
@@ -25,6 +26,8 @@ Vastverse — Innovation from Vision. A 3D, scroll-driven company website that r
    | `SMTP_FROM` | `Vastverse website <you@gmail.com>` | Optional |
    | `NOTIFY_TO` | `you@gmail.com` | Where enquiries arrive. Separate several addresses with commas. |
    | `AUTO_REPLY` | `true` | Optional: sends visitors a "we got your message" email |
+   | `XAI_API_KEY` | xAI API key | Enables Mr. Smart. Kept on the server. |
+   | `XAI_MODEL` | `grok-4` | Optional model override. |
 
 4. Deploy, then open `https://your-site.vercel.app/api/health`. It should show `"email": true`.
 5. Send yourself a test enquiry from the contact page.
@@ -86,10 +89,13 @@ frontend/              Vite site (index.html, src/*.js, public/frames)
   src/main.js          content, router, sections, estimator, forms
 backend/app/
   main.py              API routes
+  consultant.py        xAI response client (server-side key)
   mailer.py            SMTP email
   storage.py           optional Supabase storage (off by default)
   content.py           all site content (single source of truth)
   estimator.py         project estimate logic
+backend/mr_smart/
+  graph.py             LangGraph analysis and answer workflow for Mr. Smart
 backend/tests/         pytest suite (email and storage mocked)
 supabase/schema.sql    tables for when you switch storage on
 ```
@@ -109,6 +115,8 @@ cd backend && python -m app.export_content
 | GET | `/api/health` | Status, including whether email and storage are configured |
 | GET | `/api/content` | All site content |
 | POST | `/api/estimate` | Indicative project estimate |
+| POST | `/api/mr-smart/chat` | Chat with Mr. Smart using the LangGraph workflow |
+| POST | `/api/chat` | Backwards-compatible alias for Mr. Smart |
 | POST | `/api/contact` | Email the enquiry to `NOTIFY_TO` (and save it if Supabase is on) |
 | POST | `/api/newsletter` | Email you about the new subscriber (and save it if Supabase is on) |
 | GET | `/api/admin/leads` | List saved leads (Supabase only, needs `x-admin-token`) |
@@ -117,3 +125,4 @@ cd backend && python -m app.export_content
 
 - Replace the placeholder address and phone number in `backend/app/content.py`.
 - Review the estimator prices in `ESTIMATOR` in the same file.
+- Mr. Smart provides general information, not personalized investment, tax, or legal advice. Verify current or high-stakes financial decisions with a qualified professional.

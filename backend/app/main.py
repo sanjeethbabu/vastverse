@@ -36,6 +36,7 @@ from pydantic import BaseModel, Field, field_validator
 from . import consultant, mailer, storage
 from .content import CONTACT, SERVICES, all_content
 from .estimator import estimate
+from mr_smart import graph as mr_smart_graph
 
 log = logging.getLogger("vastverse")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -187,14 +188,15 @@ def post_contact(body: ContactIn, request: Request):
 
 
 @app.post("/api/chat")
+@app.post("/api/mr-smart/chat")
 def post_chat(body: ChatIn, request: Request):
     rate_limit(request, limit=15)
     if not consultant.configured():
-        raise HTTPException(503, f"Our AI consultant is offline right now. {FALLBACK}")
+        raise HTTPException(503, f"Mr. Smart is offline right now. {FALLBACK}")
     try:
-        return {"reply": consultant.reply([m.model_dump() for m in body.messages])}
+        return {"reply": mr_smart_graph.reply([m.model_dump() for m in body.messages])}
     except consultant.ConsultantError:
-        raise HTTPException(502, f"Our AI consultant couldn't answer just now. Please try again, or {FALLBACK[0].lower() + FALLBACK[1:]}")
+        raise HTTPException(502, f"Mr. Smart couldn't answer just now. Please try again, or {FALLBACK[0].lower() + FALLBACK[1:]}")
 
 
 @app.post("/api/newsletter", status_code=201)

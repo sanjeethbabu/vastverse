@@ -96,6 +96,7 @@ def test_rate_limit(client, sent):
 
 # --- AI consultant chat ------------------------------------------------------------
 from app import consultant  # noqa: E402
+from mr_smart import graph as mr_smart_graph  # noqa: E402
 
 CHAT = {"messages": [{"role": "user", "content": "I run a bakery with 5 staff."}]}
 
@@ -109,10 +110,30 @@ def test_chat_offline_without_key(client, monkeypatch):
 def test_chat_replies(client, monkeypatch):
     monkeypatch.setenv("XAI_API_KEY", "test")
     seen = {}
-    monkeypatch.setattr(consultant, "reply", lambda msgs: seen.setdefault("m", msgs) and "Try **AI ordering**.")
-    r = client.post("/api/chat", json=CHAT)
+    monkeypatch.setattr(mr_smart_graph, "reply", lambda msgs: seen.setdefault("m", msgs) and "Try **AI ordering**.")
+    r = client.post("/api/mr-smart/chat", json=CHAT)
     assert r.status_code == 200 and r.json()["reply"] == "Try **AI ordering**."
     assert seen["m"] == CHAT["messages"]
+
+def test_mr_smart_analyzes_technology_and_finance():
+    state = {"messages": [{"role": "user", "content": "Compare software costs with our cash flow."}], "focus": "general", "response": ""}
+    assert mr_smart_graph._analyze(state)["focus"] == "technology and finance"
+    state["messages"] = [{"role": "user", "content": "How do I budget for a loan?"}]
+    assert mr_smart_graph._analyze(state)["focus"] == "finance"
+    state["messages"] = [{"role": "user", "content": "How do I design a secure database?"}]
+    assert mr_smart_graph._analyze(state)["focus"] == "technology"
+    state["messages"] = [{"role": "user", "content": "I am happy with this."}]
+    assert mr_smart_graph._analyze(state)["focus"] == "general"
+
+def test_mr_smart_graph_routes_analysis_to_responder(monkeypatch):
+    seen = {}
+    def respond(messages, focus):
+        seen["messages"], seen["focus"] = messages, focus
+        return "Here are the trade-offs."
+    monkeypatch.setattr(consultant, "reply", respond)
+    messages = [{"role": "user", "content": "Compare software spend with cash flow."}]
+    assert mr_smart_graph.reply(messages) == "Here are the trade-offs."
+    assert seen == {"messages": messages, "focus": "technology and finance"}
 
 
 def test_chat_rejects_bad_payload(client, monkeypatch):
@@ -125,5 +146,5 @@ def test_chat_upstream_failure(client, monkeypatch):
     monkeypatch.setenv("XAI_API_KEY", "test")
     def boom(_):
         raise consultant.ConsultantError("down")
-    monkeypatch.setattr(consultant, "reply", boom)
+    monkeypatch.setattr(mr_smart_graph, "reply", boom)
     assert client.post("/api/chat", json=CHAT).status_code == 502

@@ -1,4 +1,4 @@
-/* AI consultant chat box on the home page. Talks to POST /api/chat (Grok on the server). */
+/* Mr. Smart chat uses the server-side LangGraph workflow. */
 import { api } from './api.js';
 import { $, $$, esc } from './ui.js';
 
@@ -18,6 +18,63 @@ function md(text) {
 export function initChat() {
   const log = $('#chatLog'), form = $('#chatForm'), input = $('#chatIn'), chips = $('#chatChips'), send = $('.chat-send', form);
   if (!log || log._init) return; log._init = true;
+  const dialog = $('#agentDialog'), opener = $('#agentOpen'), close = $('#agentClose');
+  const cursor = $('#cur'), cursorParent = cursor.parentElement;
+  const mic = $('#chatMic'), speechStatus = $('#speechStatus');
+  opener.addEventListener('click', () => {
+    if (dialog.open) return;
+    dialog.showModal();
+    dialog.append(cursor);
+  });
+  close.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => cursorParent.append(cursor));
+  dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null, listening = false;
+  if (!SpeechRecognition) {
+    mic.disabled = true;
+    mic.title = 'Speech input is not supported in this browser';
+  } else {
+    mic.addEventListener('click', () => {
+      if (listening) { recognition.stop(); return; }
+      recognition = new SpeechRecognition();
+      recognition.lang = document.documentElement.lang || 'en-US';
+      recognition.interimResults = false;
+      recognition.continuous = false;
+      recognition.onstart = () => {
+        listening = true;
+        mic.classList.add('is-listening');
+        mic.setAttribute('aria-label', 'Stop speaking');
+        speechStatus.textContent = 'Listening. Speak now.';
+      };
+      recognition.onresult = event => {
+        const transcript = Array.from(event.results).map(result => result[0].transcript).join(' ').trim();
+        if (transcript) {
+          input.value = `${input.value.trimEnd()}${input.value.trim() ? ' ' : ''}${transcript}`;
+          grow();
+          speechStatus.textContent = 'Voice message added.';
+        }
+      };
+      recognition.onerror = event => {
+        const errors = {
+          'not-allowed': 'Microphone access was denied. Allow microphone access to use speech input.',
+          'no-speech': 'No speech was detected. Try again.',
+          'audio-capture': 'No microphone is available.'
+        };
+        speechStatus.textContent = errors[event.error] || 'Speech recognition failed. Please try again.';
+      };
+      recognition.onend = () => {
+        listening = false;
+        mic.classList.remove('is-listening');
+        mic.setAttribute('aria-label', 'Speak your message');
+      };
+      try {
+        recognition.start();
+      } catch {
+        speechStatus.textContent = 'Could not start speech recognition. Check microphone permissions.';
+      }
+    });
+  }
   const history = [];
   let busy = false, ctaShown = false;
 
@@ -34,7 +91,7 @@ export function initChat() {
     input.value = ''; grow();
     const typing = add('bot', '<span class="typing" aria-label="AI is typing"><i></i><i></i><i></i></span>');
     try {
-      const { reply } = await api('/api/chat', { method: 'POST', body: { messages: history.slice(-12) }, timeout: 50000 });
+      const { reply } = await api('/api/mr-smart/chat', { method: 'POST', body: { messages: history.slice(-12) }, timeout: 50000 });
       history.push({ role: 'assistant', content: reply });
       typing.innerHTML = md(reply);
       if (!ctaShown && history.length >= 4) {

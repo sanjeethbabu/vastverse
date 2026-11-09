@@ -49,14 +49,19 @@ function renderContent() {
   // contact
   $('#svcSelect').innerHTML = '<option value="">Choose a service</option>' + C.services.map(s => `<option>${esc(s.name)}</option>`).join('') + '<option>Not sure yet</option>';
   const ct = C.contact;
-  $('#chan').innerHTML = `<div class="card" data-reveal><small>Email</small><b>${esc(ct.email)}</b><span>Best for detailed inquiries</span></div>
-    <div class="card" data-reveal><small>Phone</small><b>${esc(ct.phone)}</b><span>Call us to discuss your project</span></div>
+  const whatsapp = $('#whatsappAction'), waNumber = String(ct.phone || '').replace(/\D/g, '');
+  whatsapp.hidden = !waNumber;
+  if (waNumber) whatsapp.href = `https://wa.me/${waNumber}`;
+  const phone = String(ct.phone || '').replace(/[^\d+]/g, '');
+  const email = String(ct.email || '').trim();
+  $('#chan').innerHTML = `<a class="card" data-reveal href="mailto:${esc(email)}"><small>Email</small><b>${esc(ct.email)}</b><span>Best for detailed inquiries</span></a>
+    <a class="card" data-reveal href="tel:${esc(phone)}"><small>Phone</small><b>${esc(ct.phone)}</b><span>Call us to discuss your project</span></a>
     <div class="card" data-reveal><small>Office</small><b>${esc(ct.address)}</b><span>By appointment only</span></div>`;
   $('#next').innerHTML = C.nextSteps.map(n => `<div class="card" data-reveal><h3>${esc(n[0])}</h3><p>${esc(n[1])}</p></div>`).join('');
   $('#faq').innerHTML = C.faq.map((f, i) => `<div class="qa"><button aria-expanded="false" aria-controls="ans${i}" id="q${i}">${esc(f[0])}<i aria-hidden="true"></i></button><div class="ans" id="ans${i}" role="region" aria-labelledby="q${i}"><p>${esc(f[1])}</p></div></div>`).join('');
   // footer panels
   const foot = `<div class="pin" style="max-width:1100px"><div class="wm">vastverse</div><div class="fcols">
-    <div><h4>Get in touch</h4><p>${esc(ct.address)}<br>${esc(ct.phone)}<br>${esc(ct.email)}</p></div>
+    <div><h4>Get in touch</h4><p>${esc(ct.address)}<br><a href="tel:${esc(phone)}">${esc(ct.phone)}</a><br><a href="mailto:${esc(email)}">${esc(ct.email)}</a></p></div>
   </div><div class="fbase"><span>© ${new Date().getFullYear()} vastverse. All rights reserved.</span></div></div>`;
   $$('[data-footer]').forEach(f => f.innerHTML = foot);
   splitHeadings(); initArt(document, REDUCE);
@@ -244,7 +249,6 @@ function setupPage(r) {
   if (journey && journey.kill) journey.kill();
   const page = $(`.page[data-page="${r}"]`);
   ctx = gsap.context(() => {
-    gsap.to('#prog', { scaleX: 1, ease: 'none', scrollTrigger: { start: 0, end: 'max', scrub: true } });
     if (r === 'home') {
       universe && universe.setVisible(REDUCE ? 1 : 0);
       $('#jmap').classList.add('hide');
