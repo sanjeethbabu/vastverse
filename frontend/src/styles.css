@@ -47,8 +47,10 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:500;letter-spacing:-.025em;li
 @keyframes il-progress{to{transform:scaleX(1)}}
 @media (max-width:600px){
   .il-brand{top:calc(42% + var(--il-r) * 1.25 + 34px);top:calc(42svh + var(--il-r) * 1.25 + 34px);animation:il-fade .4s .1s ease-out both}
+  .intro-loader.is-exiting .il-brand{animation:il-mobile-out .4s ease-out forwards}
 }
 @media (prefers-reduced-motion:reduce){.il-brand,.il-foot,.intro-loader.is-exiting .il-brand{animation:none}.il-progress span{animation:none;transform:scaleX(1)}}
+@keyframes il-mobile-out{to{opacity:0}}
 .ptip{position:fixed;left:0;top:0;z-index:30;pointer-events:none;padding:10px 14px;border-radius:12px;background:rgba(6,9,15,.88);border:1px solid var(--line2);backdrop-filter:blur(8px);font-size:.85rem;opacity:0;transform:translate(-50%,-120%) scale(.96);transition:opacity .25s,transform .25s;white-space:nowrap}
 .ptip.show{opacity:1;transform:translate(-50%,-130%) scale(1)}
 .ptip b{display:block;font-family:var(--display);font-weight:500;font-size:.95rem}
@@ -486,8 +488,6 @@ html.rm .chat::after,html.rm .live-dot{animation:none}
 .float-action svg{width:25px;height:25px}
 .float-action .mr-smart-mark{width:100%;height:100%;filter:drop-shadow(0 0 8px rgba(91,168,255,.4))}
 .float-action[hidden]{display:none}
-.float-action.whatsapp-action{color:#8DFFD0}
-.float-action.whatsapp-action:hover,.float-action.whatsapp-action:focus-visible{border-color:#5BFFB0;color:#B5FFDE;box-shadow:0 0 24px rgba(91,255,176,.26)}
 .float-label{position:absolute;right:calc(100% + 10px);top:50%;transform:translate(5px,-50%);padding:6px 10px;border:1px solid var(--line2);border-radius:8px;background:rgba(5,9,16,.96);color:var(--light);font:500 .78rem/1.2 var(--body);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
 .float-action:hover .float-label,.float-action:focus-visible .float-label{opacity:1;transform:translate(0,-50%)}
 @media (max-width:600px){
@@ -497,17 +497,79 @@ html.rm .chat::after,html.rm .live-dot{animation:none}
   .float-action .mr-smart-mark{width:100%;height:100%}
 }
 
+/* Mr. Smart buddy: idle life (bob, blink, look-at-cursor) + a speech-bubble nudge */
+.agent-buddy{overflow:visible;animation:buddyBob 3.2s ease-in-out infinite}
+.agent-buddy:hover,.agent-buddy:focus-visible{animation-play-state:paused}
+.agent-buddy svg{overflow:visible}
+.buddy-body{transform-box:fill-box;transform-origin:50% 100%;transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.agent-buddy:hover .buddy-body{transform:scale(1.06) rotate(-4deg)}
+.buddy-eyes{transition:transform .18s ease-out}
+.buddy-eye{transform-box:fill-box;transform-origin:50% 50%;animation:buddyBlink 4.6s infinite}
+.buddy-eye+.buddy-eye{animation-delay:.04s}
+.agent-buddy:hover .buddy-eye{animation:none;transform:scaleY(.4)}
+.agent-buddy:hover .buddy-mouth{d:path("M21.2 27q2.8 2.6 5.6 0")}
+.buddy-mouth{transition:d .25s}
+.buddy-led{transform-box:fill-box;transform-origin:center;animation:buddyLed 1.6s ease-in-out infinite}
+.agent-buddy.has-nudge .float-label{display:none}
+.agent-nudge{position:absolute;right:calc(100% + 14px);top:2px;display:flex;align-items:flex-start;transform-origin:100% 60%;animation:bubbleIn .45s cubic-bezier(.3,1.5,.5,1) both}
+.agent-nudge[hidden]{display:none}
+.agent-nudge.is-leaving{animation:bubbleOut .25s ease-in forwards}
+.agent-bubble{position:relative;white-space:nowrap;max-width:min(240px,calc(100vw - 110px));padding:11px 15px;border:1px solid rgba(159,208,255,.4);border-radius:16px 16px 4px 16px;background:linear-gradient(145deg,rgba(20,34,58,.97),rgba(6,10,20,.97));color:var(--light);font:500 .86rem/1.4 var(--body);text-align:left;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 22px rgba(91,168,255,.18);backdrop-filter:blur(12px);transition:border-color .2s,transform .2s}
+.agent-bubble:hover,.agent-bubble:focus-visible{border-color:var(--spark);transform:translateY(-1px)}
+.agent-bubble::after{content:"";position:absolute;right:-7px;bottom:14px;width:12px;height:12px;background:rgba(10,16,30,.97);border-right:1px solid rgba(159,208,255,.4);border-top:1px solid rgba(159,208,255,.4);transform:rotate(45deg)}
+.agent-bubble-text{display:block;min-height:1.4em}
+.agent-bubble-text .caret{display:inline-block;width:2px;height:1em;margin-left:2px;vertical-align:-2px;background:var(--spark);animation:buddyCaret .8s steps(1) infinite}
+.agent-bubble-text .typing{display:inline-flex;gap:4px;padding:4px 0}
+.agent-bubble-text .typing i{width:6px;height:6px;border-radius:50%;background:var(--spark);animation:buddyDots 1s ease-in-out infinite}
+.agent-bubble-text .typing i:nth-child(2){animation-delay:.15s}
+.agent-bubble-text .typing i:nth-child(3){animation-delay:.3s}
+.agent-bubble-x{position:absolute;top:-9px;left:-9px;width:22px;height:22px;display:grid;place-items:center;padding:0;border:1px solid var(--line2);border-radius:50%;background:#070C16;color:var(--steel);font:500 14px/1 var(--body);cursor:pointer;opacity:0;transition:opacity .2s,color .2s}
+.agent-nudge:hover .agent-bubble-x,.agent-bubble-x:focus-visible{opacity:1}
+.agent-bubble-x:hover{color:#fff}
+@media (hover:none){.agent-bubble-x{opacity:1}}
+@keyframes buddyBob{0%,100%{translate:0 0}50%{translate:0 -4px}}
+@keyframes buddyBlink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes buddyLed{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.75)}}
+@keyframes buddySpin{to{transform:rotate(360deg)}}
+@keyframes bubbleIn{from{opacity:0;transform:translateX(10px) scale(.6)}to{opacity:1;transform:none}}
+@keyframes bubbleOut{to{opacity:0;transform:translateX(8px) scale(.85)}}
+@keyframes buddyCaret{50%{opacity:0}}
+@keyframes buddyDots{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+@media (max-width:600px){.agent-nudge{right:calc(100% + 10px);top:2px}.agent-bubble{font-size:.8rem;padding:9px 12px}}
+@media (prefers-reduced-motion:reduce){
+  .agent-buddy,.buddy-eye,.buddy-led{animation:none}
+  .agent-nudge,.agent-nudge.is-leaving{animation-duration:.01s}
+  .buddy-eyes{transition:none}
+}
+
+/* WhatsApp buddy: same family as Mr. Smart, in green */
+.wa-buddy{overflow:visible;animation:buddyBob 3.2s -1.6s ease-in-out infinite}
+.wa-buddy:hover,.wa-buddy:focus-visible{animation-play-state:paused}
+.float-action.wa-buddy svg.wa-mark{width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 8px rgba(91,168,255,.4))}
+.wa-icon{transform:translate(9.6px,9.4px) scale(1.2);transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.wa-buddy:hover .wa-icon{transform:translate(8.4px,8.2px) scale(1.25)}
+.wa-phone{transform-box:fill-box;transform-origin:50% 50%}
+.wa-buddy:hover .wa-phone{animation:waRing .9s ease-in-out infinite}
+.wa-dot{transform-box:fill-box;transform-origin:center;animation:buddyLed 1.6s ease-in-out infinite}
+@keyframes waRing{0%,100%{transform:rotate(0)}10%,30%{transform:rotate(-14deg)}20%,40%{transform:rotate(14deg)}50%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){.wa-buddy,.wa-dot,.wa-buddy:hover .wa-phone{animation:none}}
+
+/* Contact buttons stay hidden (intro, home hero) until .fa-enter is set, then fade in softly */
+.floating-actions{transition:opacity .45s ease}
+.floating-actions:not(.fa-enter){opacity:0;pointer-events:none}
+.fa-enter .agent-buddy{animation:faIn .6s .2s ease-out both,buddyBob 3.2s 1.05s ease-in-out infinite}
+.fa-enter .wa-buddy{animation:faIn .6s .32s ease-out both,buddyBob 3.2s -.35s ease-in-out infinite}
+.fa-enter .agent-buddy>svg{animation:faPop .6s .2s cubic-bezier(.22,.61,.36,1) backwards}
+.fa-enter .wa-buddy>svg{animation:faPop .6s .32s cubic-bezier(.22,.61,.36,1) backwards}
+@keyframes faIn{from{opacity:0}to{opacity:1}}
+@keyframes faPop{from{transform:translateY(8px) scale(.9)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.fa-enter .agent-buddy,.fa-enter .wa-buddy,.fa-enter .agent-buddy>svg,.fa-enter .wa-buddy>svg{animation:none}}
+
 /* "World 03 / 11 · Moon system" coordinate tag above each section */
 .world-tag{display:flex;align-items:center;gap:10px;font:500 .72rem/1 ui-monospace,"SFMono-Regular",Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--steel);margin-bottom:12px}
 .world-tag i{width:22px;height:1px;background:linear-gradient(90deg,var(--spark),transparent)}
 .world-tag b{color:var(--spark);font-weight:600}
 /* name story: VAST + VERSE */
-.name-eq{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin:22px 0 22px}
-.name-eq > div{padding:12px 16px;border:1px solid var(--line);border-radius:16px;background:rgba(10,14,24,.78)}
-.name-eq b{display:block;font-family:var(--display);font-size:1.05rem;letter-spacing:.04em;color:#fff}
-.name-eq span{font-size:.8rem;color:var(--steel)}
-.name-eq .op{display:grid;place-items:center;border:0;background:none;padding:0 2px;font-family:var(--display);color:var(--spark);font-size:1.2rem}
-.name-eq .eq-res{border-color:rgba(159,208,255,.45);background:linear-gradient(135deg,rgba(91,168,255,.18),rgba(10,14,24,.6));box-shadow:0 0 30px -8px rgba(91,168,255,.5)}
 /* warp-speed page transition */
 #warp{position:fixed;inset:0;z-index:90;pointer-events:none;opacity:0;transition:opacity .25s}
 #warp.on{opacity:1}

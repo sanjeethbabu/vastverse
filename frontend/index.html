@@ -212,13 +212,6 @@
       <div class="pin col-w">
         <span class="kicker">Welcome to the Vastverse</span>
         <h2 class="big split">Innovation <b>from vision.</b></h2>
-        <div class="name-eq" data-reveal aria-label="Vast, meaning boundless, plus verse, meaning universe, equals Vastverse: one universe of software and AI">
-          <div><b>VAST</b><span>Boundless, big</span></div>
-          <div class="op" aria-hidden="true">+</div>
-          <div><b>VERSE</b><span>A universe</span></div>
-          <div class="op" aria-hidden="true">=</div>
-          <div class="eq-res"><b>VASTVERSE</b><span>One universe of software &amp; AI, for your business</span></div>
-        </div>
         <p class="lede" data-reveal>We are a technology and digital innovation company. We build custom software, web and mobile apps, SaaS platforms and next-generation AI that help startups, entrepreneurs and established businesses turn ideas into future-ready technology.</p>
         <div class="stats" id="stats" data-reveal></div>
       </div>
@@ -452,23 +445,56 @@
 <nav class="jmap hide" id="jmap" aria-label="Sections"><span class="lbl" id="jlbl"></span><div class="dots" id="jdots"></div></nav>
 
 <nav class="floating-actions" aria-label="Quick contact">
-  <button class="float-action" id="agentOpen" type="button" aria-label="Chat with Mr. Smart" aria-haspopup="dialog" aria-controls="agentDialog">
+  <div class="agent-nudge" id="agentNudge" hidden>
+    <button class="agent-bubble" id="agentBubble" type="button" aria-label="Open chat with Mr. Smart">
+      <span class="agent-bubble-text" id="agentBubbleText"></span>
+    </button>
+  </div>
+  <button class="float-action agent-buddy" id="agentOpen" type="button" aria-label="Chat with Mr. Smart" aria-haspopup="dialog" aria-controls="agentDialog">
     <svg class="mr-smart-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-      <circle cx="24" cy="24" r="21.5" fill="#07101D" stroke="#5BA8FF" stroke-opacity=".62"/>
-      <path d="M24 7.5v4M21.5 7.5h5" stroke="#9FD0FF" stroke-width="1.5" stroke-linecap="round"/>
-      <path d="M12.5 19.5c0-5.1 4.5-8.5 11.5-8.5s11.5 3.4 11.5 8.5v9c0 6.1-4.6 9.5-11.5 9.5s-11.5-3.4-11.5-9.5v-9Z" fill="url(#mrSmartFace)" stroke="#D8EEFF" stroke-width="1.5"/>
-      <path d="M12.7 20h-2.2a3.1 3.1 0 0 0-3.1 3.1v3.8a3.1 3.1 0 0 0 3.1 3.1h2.2m22.6-10h2.2a3.1 3.1 0 0 1 3.1 3.1v3.8a3.1 3.1 0 0 1-3.1 3.1h-2.2" fill="#10233A" stroke="#5BA8FF" stroke-width="1.5"/>
-      <path d="M18 23.5h.2m11.6 0h.2" stroke="#75E8F4" stroke-width="3.2" stroke-linecap="round"/>
-      <path d="M19.5 29c1.2 1.1 2.7 1.7 4.5 1.7s3.3-.6 4.5-1.7" stroke="#9FD0FF" stroke-width="1.4" stroke-linecap="round"/>
-      <path d="m17.5 36-2 3m15-3 2 3M20 38h8" stroke="#5BA8FF" stroke-width="1.4" stroke-linecap="round"/>
-      <circle cx="24" cy="7" r="1.5" fill="#9FD0FF"/>
-      <defs><linearGradient id="mrSmartFace" x1="13" y1="12" x2="35" y2="39" gradientUnits="userSpaceOnUse"><stop stop-color="#21466B"/><stop offset="1" stop-color="#0B1728"/></linearGradient></defs>
+      <circle cx="24" cy="24" r="22" fill="url(#bgGlowB)" stroke="#8CBFFF" stroke-opacity=".45" stroke-width="1.2"/>
+      <g class="buddy-body" >
+        <path d="M24 13V9.6" stroke="#9FB8D8" stroke-width="1.4" stroke-linecap="round"/>
+        <circle class="buddy-led" cx="24" cy="8.2" r="2" fill="#7DF3FF" filter="url(#glowB)"/>
+        <rect x="9.6" y="20" width="3.6" height="9" rx="1.8" fill="url(#earB)"/>
+        <rect x="34.8" y="20" width="3.6" height="9" rx="1.8" fill="url(#earB)"/>
+        <path d="M10.6 22.5v4M37.4 22.5v4" stroke="#7DF3FF" stroke-width="1" stroke-linecap="round" opacity=".85"/>
+        <rect x="12.4" y="12.6" width="23.2" height="22.4" rx="9.5" fill="url(#headB)" stroke="#B8D7FF" stroke-opacity=".55" stroke-width=".9"/>
+        <ellipse cx="19.5" cy="15.6" rx="5.2" ry="1.7" fill="#fff" opacity=".28"/>
+        <rect x="14.6" y="18" width="18.8" height="12" rx="5.6" fill="url(#visorB)" stroke="#7DF3FF" stroke-opacity=".35" stroke-width=".7"/>
+        <path d="M16.5 20.2h5.8l-3.4 7.4h-2.6Z" fill="#fff" opacity=".07"/>
+        <g class="buddy-eyes" filter="url(#glowB)">
+          <rect class="buddy-eye" x="18.4" y="21.2" width="3.2" height="4.8" rx="1.6" fill="#7DF3FF"/>
+          <rect class="buddy-eye" x="26.4" y="21.2" width="3.2" height="4.8" rx="1.6" fill="#7DF3FF"/>
+        </g>
+        <path class="buddy-mouth" d="M22 27.4q2 1.5 4 0" stroke="#7DF3FF" stroke-width="1.1" stroke-linecap="round"/>
+        <rect x="21" y="35.6" width="6" height="1.6" rx=".8" fill="#5BA8FF" opacity=".7"/>
+      </g>
+      <defs>
+        <radialGradient id="bgGlowB" cx=".5" cy=".42" r=".6"><stop stop-color="#12284A"/><stop offset=".7" stop-color="#060E1B"/><stop offset="1" stop-color="#03070F"/></radialGradient>
+        <radialGradient id="headB" cx=".3" cy=".2" r=".95"><stop stop-color="#5B8FD0"/><stop offset=".35" stop-color="#25508A"/><stop offset=".75" stop-color="#112848"/><stop offset="1" stop-color="#081426"/></radialGradient>
+        <linearGradient id="earB" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3B6AA4"/><stop offset="1" stop-color="#0D1E36"/></linearGradient>
+        <linearGradient id="visorB" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0E1F3A"/><stop offset="1" stop-color="#01040A"/></linearGradient>
+        <filter id="glowB" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation=".9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
     </svg>
     <span class="float-label">Mr. Smart</span>
   </button>
-  <a class="float-action whatsapp-action" id="whatsappAction" href="https://wa.me/916379588598" target="_blank" rel="noopener noreferrer" aria-label="Message Vastverse on WhatsApp">
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L3 20l1.2-4.9a8.2 8.2 0 1 1 16-3.4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.2 7.8c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4 0 .5l-.5.6c-.2.2-.2.4-.1.6.4.7 1 1.3 1.7 1.7.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.3.1.4.3.4.5 0 .4-.2 1.2-.8 1.6-.5.4-1.1.6-1.8.4-1-.2-2.3-.8-3.5-2-1.1-1.1-1.8-2.5-2-3.5-.2-.7.1-1.3.7-1.8Z" fill="currentColor"/></svg>
-    <span class="float-label">WhatsApp</span>
+  <a class="float-action whatsapp-action wa-buddy" id="whatsappAction" href="https://wa.me/916379588598" target="_blank" rel="noopener noreferrer" aria-label="Message Vastverse on WhatsApp">
+    <svg class="wa-mark" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <circle cx="24" cy="24" r="22" fill="url(#waBg)" stroke="#8CBFFF" stroke-opacity=".45" stroke-width="1.2"/>
+      <g class="wa-icon" transform="translate(9.6 9.4) scale(1.2)">
+        <path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L3 20l1.2-4.9a8.2 8.2 0 1 1 16-3.4Z" fill="url(#waBubble)" stroke="#D6ECFF" stroke-width="1.1" stroke-linejoin="round" filter="url(#waGlow)"/>
+        <ellipse cx="9.4" cy="7.2" rx="3.6" ry="1.4" fill="#fff" opacity=".3" transform="rotate(-18 9.4 7.2)"/>
+        <g class="wa-phone"><path d="M8.2 7.8c.2-.5.4-.5.7-.5h.5c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4 0 .5l-.5.6c-.2.2-.2.4-.1.6.4.7 1 1.3 1.7 1.7.2.1.4.1.6-.1l.7-.8c.2-.2.4-.2.6-.1l1.6.8c.3.1.4.3.4.5 0 .4-.2 1.2-.8 1.6-.5.4-1.1.6-1.8.4-1-.2-2.3-.8-3.5-2-1.1-1.1-1.8-2.5-2-3.5-.2-.7.1-1.3.7-1.8Z" fill="#fff"/></g>
+      </g>
+      <circle class="wa-dot" cx="35" cy="13" r="2.4" fill="#7DF3FF" stroke="#03070F" stroke-width="1"/>
+      <defs>
+        <radialGradient id="waBg" cx=".5" cy=".42" r=".6"><stop stop-color="#12284A"/><stop offset=".7" stop-color="#060E1B"/><stop offset="1" stop-color="#03070F"/></radialGradient>
+        <radialGradient id="waBubble" cx=".3" cy=".2" r=".95"><stop stop-color="#9FD0FF"/><stop offset=".4" stop-color="#4A8FE0"/><stop offset="1" stop-color="#173C6E"/></radialGradient>
+        <filter id="waGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation=".8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+    </svg>
   </a>
 </nav>
 
@@ -477,16 +503,32 @@
     <div class="chat-head">
       <span class="chat-av" aria-hidden="true">
         <svg class="mr-smart-mark" viewBox="0 0 48 48" fill="none">
-          <circle cx="24" cy="24" r="21.5" fill="#07101D" stroke="#5BA8FF" stroke-opacity=".62"/>
-          <path d="M24 7.5v4M21.5 7.5h5" stroke="#9FD0FF" stroke-width="1.5" stroke-linecap="round"/>
-          <path d="M12.5 19.5c0-5.1 4.5-8.5 11.5-8.5s11.5 3.4 11.5 8.5v9c0 6.1-4.6 9.5-11.5 9.5s-11.5-3.4-11.5-9.5v-9Z" fill="url(#mrSmartFaceChat)" stroke="#D8EEFF" stroke-width="1.5"/>
-          <path d="M12.7 20h-2.2a3.1 3.1 0 0 0-3.1 3.1v3.8a3.1 3.1 0 0 0 3.1 3.1h2.2m22.6-10h2.2a3.1 3.1 0 0 1 3.1 3.1v3.8a3.1 3.1 0 0 1-3.1 3.1h-2.2" fill="#10233A" stroke="#5BA8FF" stroke-width="1.5"/>
-          <path d="M18 23.5h.2m11.6 0h.2" stroke="#75E8F4" stroke-width="3.2" stroke-linecap="round"/>
-          <path d="M19.5 29c1.2 1.1 2.7 1.7 4.5 1.7s3.3-.6 4.5-1.7" stroke="#9FD0FF" stroke-width="1.4" stroke-linecap="round"/>
-          <path d="m17.5 36-2 3m15-3 2 3M20 38h8" stroke="#5BA8FF" stroke-width="1.4" stroke-linecap="round"/>
-          <circle cx="24" cy="7" r="1.5" fill="#9FD0FF"/>
-          <defs><linearGradient id="mrSmartFaceChat" x1="13" y1="12" x2="35" y2="39" gradientUnits="userSpaceOnUse"><stop stop-color="#21466B"/><stop offset="1" stop-color="#0B1728"/></linearGradient></defs>
-        </svg>
+      <circle cx="24" cy="24" r="22" fill="url(#bgGlowC)" stroke="#8CBFFF" stroke-opacity=".45" stroke-width="1.2"/>
+      <g >
+        <path d="M24 13V9.6" stroke="#9FB8D8" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="24" cy="8.2" r="2" fill="#7DF3FF" filter="url(#glowC)"/>
+        <rect x="9.6" y="20" width="3.6" height="9" rx="1.8" fill="url(#earC)"/>
+        <rect x="34.8" y="20" width="3.6" height="9" rx="1.8" fill="url(#earC)"/>
+        <path d="M10.6 22.5v4M37.4 22.5v4" stroke="#7DF3FF" stroke-width="1" stroke-linecap="round" opacity=".85"/>
+        <rect x="12.4" y="12.6" width="23.2" height="22.4" rx="9.5" fill="url(#headC)" stroke="#B8D7FF" stroke-opacity=".55" stroke-width=".9"/>
+        <ellipse cx="19.5" cy="15.6" rx="5.2" ry="1.7" fill="#fff" opacity=".28"/>
+        <rect x="14.6" y="18" width="18.8" height="12" rx="5.6" fill="url(#visorC)" stroke="#7DF3FF" stroke-opacity=".35" stroke-width=".7"/>
+        <path d="M16.5 20.2h5.8l-3.4 7.4h-2.6Z" fill="#fff" opacity=".07"/>
+        <g filter="url(#glowC)">
+          <rect x="18.4" y="21.2" width="3.2" height="4.8" rx="1.6" fill="#7DF3FF"/>
+          <rect x="26.4" y="21.2" width="3.2" height="4.8" rx="1.6" fill="#7DF3FF"/>
+        </g>
+        <path d="M22 27.4q2 1.5 4 0" stroke="#7DF3FF" stroke-width="1.1" stroke-linecap="round"/>
+        <rect x="21" y="35.6" width="6" height="1.6" rx=".8" fill="#5BA8FF" opacity=".7"/>
+      </g>
+      <defs>
+        <radialGradient id="bgGlowC" cx=".5" cy=".42" r=".6"><stop stop-color="#12284A"/><stop offset=".7" stop-color="#060E1B"/><stop offset="1" stop-color="#03070F"/></radialGradient>
+        <radialGradient id="headC" cx=".3" cy=".2" r=".95"><stop stop-color="#5B8FD0"/><stop offset=".35" stop-color="#25508A"/><stop offset=".75" stop-color="#112848"/><stop offset="1" stop-color="#081426"/></radialGradient>
+        <linearGradient id="earC" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#3B6AA4"/><stop offset="1" stop-color="#0D1E36"/></linearGradient>
+        <linearGradient id="visorC" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#0E1F3A"/><stop offset="1" stop-color="#01040A"/></linearGradient>
+        <filter id="glowC" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation=".9" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+    </svg>
       </span>
       <div><b id="agentTitle">Mr. Smart</b><span id="chatStatus">Technology, finance &amp; business assistant</span></div>
       <button class="agent-close" id="agentClose" type="button" aria-label="Close AI agent">×</button>

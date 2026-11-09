@@ -244,6 +244,14 @@ function revealHooks(el) {
   };
 }
 
+/* contact buttons: hidden through the intro and the home hero, flash in once the visitor reaches "Innovation from vision" */
+let introDone = false, wantFab = false;
+function setFab(on) {
+  wantFab = on;
+  const fa = $('.floating-actions');
+  if (fa) fa.classList.toggle('fa-enter', on && introDone);
+}
+
 function setupPage(r) {
   if (ctx) ctx.revert();
   if (journey && journey.kill) journey.kill();
@@ -258,7 +266,9 @@ function setupPage(r) {
         wasDone = done;
         universe && universe.setVisible(done ? 1 : 0); $('#jmap').classList.toggle('hide', !done);
       } });
-    } else { universe && universe.setVisible(1); $('#jmap').classList.remove('hide'); }
+      setFab(false);
+      ScrollTrigger.create({ trigger: $('.panel .big', page), start: 'top 90%', onEnter: () => setFab(true), onLeaveBack: () => setFab(false) });
+    } else { universe && universe.setVisible(1); $('#jmap').classList.remove('hide'); setFab(true); }
     journey = buildJourney(page, r);
     if (REDUCE) $$('[data-count]', page).forEach(c => c.textContent = c.dataset.count + (c.dataset.suf || ''));
     else animatePage(page, journey);
@@ -316,6 +326,7 @@ initCursor(); initTilt(REDUCE); initModal(); initChat();
   const finish = () => {
     loader.classList.add('is-done');
     document.body.classList.remove('is-loading');
+    introDone = true; setFab(wantFab);
     setTimeout(() => { window.__vvIntro && window.__vvIntro.stop(); loader.remove(); }, 800);
   };
   setTimeout(() => {

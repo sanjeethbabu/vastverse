@@ -26,6 +26,7 @@ export function initChat() {
     dialog.showModal();
     dialog.append(cursor);
   });
+  initBuddy(opener, dialog);
   close.addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => cursorParent.append(cursor));
   dialog.addEventListener('click', e => { if (e.target === dialog) dialog.close(); });
@@ -112,4 +113,65 @@ export function initChat() {
   input.addEventListener('input', grow);
   input.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(input.value); } });
   $$('button', chips).forEach(b => b.addEventListener('click', () => ask(b.textContent)));
+}
+
+/* Mr. Smart buddy: eyes follow the pointer; on hover it says hi. */
+function initBuddy(btn, dialog) {
+  const nudge = $('#agentNudge'), bubble = $('#agentBubble'), text = $('#agentBubbleText');
+  const eyes = $('.buddy-eyes', btn);
+  if (!nudge || !eyes) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LINE = 'Hi, I’m Mr. Smart';
+
+  // eyes look toward the pointer (max ~2px), rAF-throttled
+  if (!reduce) {
+    let px = 0, py = 0, raf = 0;
+    addEventListener('pointermove', e => {
+      px = e.clientX; py = e.clientY;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const r = btn.getBoundingClientRect();
+        const dx = px - (r.left + r.width / 2), dy = py - (r.top + r.height / 2);
+        const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 220) * 2;
+        eyes.style.transform = `translate(${(dx / d * k).toFixed(2)}px,${(dy / d * k).toFixed(2)}px)`;
+      });
+    }, { passive: true });
+  }
+
+  let typer = 0, leaveT = 0, shown = false;
+  function show() {
+    clearTimeout(leaveT);
+    if (shown || dialog.open) return;
+    shown = true;
+    nudge.classList.remove('is-leaving'); nudge.hidden = false;
+    btn.classList.add('has-nudge');
+    if (reduce) { text.textContent = LINE; return; }
+    const chars = Array.from(LINE); let i = 0;
+    clearInterval(typer);
+    typer = setInterval(() => {
+      i++;
+      text.innerHTML = esc(chars.slice(0, i).join('')) + (i < chars.length ? '<span class="caret"></span>' : '');
+      if (i >= chars.length) clearInterval(typer);
+    }, 35);
+  }
+  function hide(now) {
+    clearTimeout(leaveT);
+    leaveT = setTimeout(() => {
+      if (!shown) return;
+      shown = false; clearInterval(typer);
+      btn.classList.remove('has-nudge');
+      nudge.classList.add('is-leaving');
+      setTimeout(() => { if (!shown) { nudge.hidden = true; nudge.classList.remove('is-leaving'); } }, reduce ? 0 : 250);
+    }, now ? 0 : 180);
+  }
+
+  [btn, nudge].forEach(el => {
+    el.addEventListener('pointerenter', e => { if (e.pointerType !== 'touch') show(); });
+    el.addEventListener('pointerleave', () => hide());
+  });
+  btn.addEventListener('focus', () => { if (btn.matches(':focus-visible')) show(); });
+  btn.addEventListener('blur', () => hide());
+  btn.addEventListener('click', () => hide(true));
+  bubble.addEventListener('click', () => { hide(true); btn.click(); });
 }
