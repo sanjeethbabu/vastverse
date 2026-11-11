@@ -201,6 +201,7 @@ function buildJourney(page, r) {
 /* zigzag entrance: content in a left panel slides in from the left, right panel from the right */
 const sideOf = el => { const p = el.closest('.panel'); return p && p.classList.contains('zz-r') ? 1 : -1; };
 const SLIDE = () => Math.min(120, innerWidth * .08);
+const CARD = '.card, .sol, .step, .tilt';
 
 function animatePage(page, J) {
   const first = $('.panel', page);
@@ -224,6 +225,12 @@ function animatePage(page, J) {
   });
   $$('[data-reveal]', page).forEach((el, i) => {
     const inFirst = first.contains(el) && page.dataset.page !== 'home';
+    if (el.matches(CARD)) {   // cards: straight fade-up in place, no sideways slide or 3D turn
+      gsap.from(el, { y: 20, opacity: 0, duration: .9, ease: 'power2.out', force3D: true,
+        delay: inFirst ? .4 + (i % 4) * .07 : (i % 4) * .06, scrollTrigger: inFirst ? undefined : trig(el, J),
+        ...revealHooks(el) });
+      return;
+    }
     gsap.from(el, { x: sideOf(el) * SLIDE(), y: 20, opacity: 0, rotateY: sideOf(el) * -8, scale: .97, transformPerspective: 900, duration: 1, ease: 'power3.out', force3D: true,
       delay: inFirst ? .4 + (i % 4) * .07 : (i % 4) * .06, scrollTrigger: inFirst ? undefined : trig(el, J),
       ...revealHooks(el) });
